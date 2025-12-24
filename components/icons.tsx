@@ -99,6 +99,12 @@ export const BuildingIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+export const TaxIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm12-9.41L5.59 19.41 4.17 18l13.42-13.42L19 5.59z"/>
+    </svg>
+);
+
 export const SchoolIcon: React.FC<IconProps> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 3L1 9l11 6 9-4.5V12h-2V10l-7 3.5-9-4.5L12 5l9 4.5V12h2V9L12 3zm-1 9.5V17h2v-4.5l-1-0.5-1 0.5zM12 13.2l5 2.5v3.6l-5-2.5-5 2.5v-3.6l5-2.5z"/>

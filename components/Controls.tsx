@@ -1,18 +1,19 @@
 
 import React from 'react';
-import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon } from './icons';
+import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon, TaxIcon } from './icons';
 
 interface ControlsProps {
   onPassDay: () => void;
   onOpenLawModal: () => void;
   onOpenApprovedLawsModal: () => void;
   onOpenImprovementModal: () => void;
+  onOpenTaxModal: () => void;
   selectedPersonId: string | null;
   onConvince: () => void;
   onBribe: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, selectedPersonId, onConvince, onBribe }) => {
+const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, onOpenTaxModal, selectedPersonId, onConvince, onBribe }) => {
   if (selectedPersonId) {
     return (
       <div className="bg-gray-500 p-2 h-[104px] flex items-center justify-center space-x-4">
@@ -35,31 +36,28 @@ const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenAp
   }
 
   return (
-    <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-2">
+    <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-1">
       <button
         onClick={onOpenImprovementModal}
-        className={`
-          w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center
-          bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2
-        `}
+        className="w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2"
       >
         <BuildingIcon className="w-9 h-9 text-teal-100"/>
       </button>
       <button
+        onClick={onOpenTaxModal}
+        className="w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-purple-600 border-b-4 border-purple-800 hover:bg-purple-700 active:border-b-2"
+      >
+        <TaxIcon className="w-9 h-9 text-purple-100"/>
+      </button>
+      <button
         onClick={onOpenApprovedLawsModal}
-        className={`
-          w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center
-          bg-gray-600 border-b-4 border-gray-800 hover:bg-gray-700 active:border-b-2
-        `}
+        className="w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-gray-600 border-b-4 border-gray-800 hover:bg-gray-700 active:border-b-2"
       >
         <ListIcon className="w-9 h-9 text-gray-100"/>
       </button>
       <button
         onClick={onOpenLawModal}
-        className={`
-          w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center
-          bg-blue-500 border-b-4 border-blue-700 hover:bg-blue-600 active:border-b-2
-        `}
+        className="w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-blue-500 border-b-4 border-blue-700 hover:bg-blue-600 active:border-b-2"
       >
         <LawIcon className="w-9 h-9 text-blue-100"/>
       </button>

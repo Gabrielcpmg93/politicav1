@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import Parliament from './components/Parliament';
 import Controls from './components/Controls';
@@ -8,6 +8,7 @@ import Menu from './components/Menu';
 import LawModal from './components/LawModal';
 import ApprovedLawsModal from './components/ApprovedLawsModal';
 import ImprovementModal from './components/ImprovementModal';
+import TaxModal from './components/TaxModal';
 import Notification from './components/Notification';
 import { initialParliamentLayout } from './constants';
 import type { ParliamentLayout, Law } from './types';
@@ -32,13 +33,17 @@ const App: React.FC = () => {
   const [parliamentLayout, setParliamentLayout] = useState<ParliamentLayout>(initialParliamentLayout);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
-  // Lawmaking State
+  // Modal States
   const [isLawModalOpen, setIsLawModalOpen] = useState<boolean>(false);
   const [isApprovedLawsModalOpen, setIsApprovedLawsModalOpen] = useState<boolean>(false);
   const [isImprovementModalOpen, setIsImprovementModalOpen] = useState<boolean>(false);
+  const [isTaxModalOpen, setIsTaxModalOpen] = useState<boolean>(false);
+
+  // Game Logic State
   const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
   const [approvedLaws, setApprovedLaws] = useState<Law[]>([]);
   const [notification, setNotification] = useState<NotificationState>(null);
+  const [taxRates, setTaxRates] = useState({ income: 10, corporate: 15, sales: 5 });
 
   // Footer State
   const [supporters, setSupporters] = useState<number>(5);
@@ -49,6 +54,15 @@ const App: React.FC = () => {
   const [lawsPassed, setLawsPassed] = useState<number>(7);
   const [year, setYear] = useState<number>(2026);
   const [day, setDay] = useState<number>(1);
+
+  useEffect(() => {
+    const baseIncome = 20; // Base income from other sources
+    const incomeFromPopulation = population * (taxRates.income / 100) * 0.1;
+    const incomeFromCorporate = 10 * (taxRates.corporate / 10);
+    const incomeFromSales = population * (taxRates.sales / 100) * 0.2;
+    const totalIncome = Math.round(baseIncome + incomeFromPopulation + incomeFromCorporate + incomeFromSales);
+    setIncome(totalIncome);
+  }, [taxRates, population]);
 
   const handleStartGame = (sYear: number, party: string) => {
     setYear(sYear);
@@ -117,6 +131,8 @@ const App: React.FC = () => {
   const handleCloseApprovedLawsModal = () => setIsApprovedLawsModalOpen(false);
   const handleOpenImprovementModal = () => setIsImprovementModalOpen(true);
   const handleCloseImprovementModal = () => setIsImprovementModalOpen(false);
+  const handleOpenTaxModal = () => setIsTaxModalOpen(true);
+  const handleCloseTaxModal = () => setIsTaxModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     const newLaw: Law = {
@@ -166,6 +182,19 @@ const App: React.FC = () => {
     }
   };
 
+  const handleTaxChange = (newRates: { income: number; corporate: number; sales: number }) => {
+    const oldAverage = (taxRates.income + taxRates.corporate + taxRates.sales) / 3;
+    const newAverage = (newRates.income + newRates.corporate + newRates.sales) / 3;
+    const happinessChange = Math.round(oldAverage - newAverage); // More tax -> lower happiness
+    setHappiness(prev => Math.max(1, Math.min(100, prev + happinessChange)));
+
+    setTaxRates(newRates);
+    setNotification({
+        message: `Impostos atualizados! Felicidade ${happinessChange >= 0 ? '+' : ''}${happinessChange}.`,
+        type: 'success',
+    });
+  };
+
   if (!gameStarted) {
     return <Menu onStartGame={handleStartGame} />;
   }
@@ -203,6 +232,7 @@ const App: React.FC = () => {
         onBribe={handleBribe}
         onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
         onOpenImprovementModal={handleOpenImprovementModal}
+        onOpenTaxModal={handleOpenTaxModal}
       />
       <Footer
         supporters={supporters}
@@ -229,6 +259,12 @@ const App: React.FC = () => {
         onClose={handleCloseImprovementModal}
         onPurchase={handlePurchaseImprovement}
         playerMoney={money}
+      />
+      <TaxModal
+        isOpen={isTaxModalOpen}
+        onClose={handleCloseTaxModal}
+        onSave={handleTaxChange}
+        currentRates={taxRates}
       />
     </div>
   );
