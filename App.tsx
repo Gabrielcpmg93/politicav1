@@ -1,0 +1,173 @@
+
+import React, { useState, useCallback } from 'react';
+import Header from './components/Header';
+import Parliament from './components/Parliament';
+import Controls from './components/Controls';
+import Footer from './components/Footer';
+import Menu from './components/Menu';
+import LawModal from './components/LawModal';
+import Notification from './components/Notification';
+import { initialParliamentLayout } from './constants';
+import type { ParliamentLayout, Law } from './types';
+
+type NotificationState = {
+  message: string;
+  type: 'success' | 'error';
+} | null;
+
+const App: React.FC = () => {
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [startYear, setStartYear] = useState<number>(2026);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedParty, setSelectedParty] = useState<string>('progressivists');
+  
+  // Top Header State
+  const [money, setMoney] = useState<number>(102);
+  const [moneyChange, setMoneyChange] = useState<number>(7);
+  const [population, setPopulation] = useState<number>(97);
+  const [happiness, setHappiness] = useState<number>(1);
+
+  // Parliament State
+  const [parliamentLayout, setParliamentLayout] = useState<ParliamentLayout>(initialParliamentLayout);
+
+  // Lawmaking State
+  const [isLawModalOpen, setIsLawModalOpen] = useState<boolean>(false);
+  const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
+  const [notification, setNotification] = useState<NotificationState>(null);
+
+  // Footer State
+  const [supporters, setSupporters] = useState<number>(5);
+  const [income, setIncome] = useState<number>(53);
+  const [incomeChange, setIncomeChange] = useState<number>(1);
+  const [expenses, setExpenses] = useState<number>(50);
+  const [approval, setApproval] = useState<number>(8.68);
+  const [lawsPassed, setLawsPassed] = useState<number>(7);
+  const [year, setYear] = useState<number>(startYear);
+  const [day, setDay] = useState<number>(1);
+
+  const handleStartGame = (sYear: number, party: string) => {
+    setStartYear(sYear);
+    setYear(sYear);
+    setSelectedParty(party);
+    setGameStarted(true);
+  };
+  
+  const handleNextTurn = useCallback(() => {
+    setYear(prev => prev + 1);
+    setMoney(prev => prev + income - expenses + moneyChange);
+    setPopulation(prev => Math.floor(prev * (1 + Math.random() * 0.01)));
+    setHappiness(prev => Math.max(1, Math.min(100, Math.round(prev + (Math.random() - 0.45) * 2))));
+    setApproval(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 2)));
+
+    // Randomly add a star to a person
+    setParliamentLayout(prevLayout => {
+      const newLayout = JSON.parse(JSON.stringify(prevLayout));
+      const flatPeople = newLayout.flat();
+      const nonStarPeople = flatPeople.filter((p: any) => p.color !== 'empty' && p.statusIcon !== 'star');
+      if(nonStarPeople.length > 0) {
+        const randomPerson = nonStarPeople[Math.floor(Math.random() * nonStarPeople.length)];
+        
+        for(let r = 0; r < newLayout.length; r++) {
+            for(let c = 0; c < newLayout[r].length; c++) {
+                if(newLayout[r][c].statusIcon === 'star') {
+                    delete newLayout[r][c].statusIcon; // Remove old stars
+                }
+                if(newLayout[r][c].id === randomPerson.id) {
+                    newLayout[r][c].statusIcon = 'star';
+                }
+            }
+        }
+      }
+      return newLayout;
+    });
+
+  }, [income, expenses, moneyChange]);
+
+  const handlePassDay = () => {
+    // Process one pending law per day passed
+    if (pendingLaws.length > 0) {
+      const lawToProcess = pendingLaws[0];
+      const remainingLaws = pendingLaws.slice(1);
+      
+      const isApproved = Math.random() > 0.5; // 50% chance of approval
+
+      if (isApproved) {
+          setLawsPassed(prev => prev + 1);
+          setNotification({ message: `Lei "${lawToProcess.name}" APROVADA!`, type: 'success' });
+      } else {
+          setNotification({ message: `Lei "${lawToProcess.name}" REJEITADA.`, type: 'error' });
+      }
+      setPendingLaws(remainingLaws);
+    }
+
+    if (day < 28) {
+      setDay(prevDay => prevDay + 1);
+    } else {
+      setDay(1);
+      handleNextTurn(); // This increments the year
+    }
+  };
+
+  const handleOpenLawModal = () => setIsLawModalOpen(true);
+  const handleCloseLawModal = () => setIsLawModalOpen(false);
+  const handleProposeLaw = (name: string, description: string) => {
+    const newLaw: Law = {
+        id: crypto.randomUUID(),
+        name,
+        description,
+        status: 'pending'
+    };
+    setPendingLaws(prev => [...prev, newLaw]);
+    handleCloseLawModal();
+    setNotification({ message: 'Lei enviada para votação!', type: 'success' });
+  };
+  
+  if (!gameStarted) {
+    return <Menu onStartGame={handleStartGame} />;
+  }
+
+  return (
+    <div className="w-[420px] h-[850px] bg-gray-600 flex flex-col overflow-hidden shadow-2xl border-4 border-gray-700 rounded-2xl">
+      <Header
+        money={money}
+        moneyChange={moneyChange}
+        population={population}
+        happiness={happiness}
+      />
+      <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
+        <Parliament layout={parliamentLayout} />
+        <div className="absolute bottom-40 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center">
+            <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
+        </div>
+        {notification && (
+            <Notification 
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification(null)}
+            />
+        )}
+      </main>
+      <Controls 
+        onOpenLawModal={handleOpenLawModal}
+        onPassDay={handlePassDay}
+      />
+      <Footer
+        supporters={supporters}
+        income={income}
+        incomeChange={incomeChange}
+        expenses={expenses}
+        approval={approval}
+        lawsPassed={lawsPassed}
+        year={year}
+        day={day}
+      />
+      <LawModal 
+        isOpen={isLawModalOpen}
+        onClose={handleCloseLawModal}
+        onProposeLaw={handleProposeLaw}
+      />
+    </div>
+  );
+};
+
+export default App;

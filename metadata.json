@@ -1,0 +1,5 @@
+{
+  "name": "Parliament Simulator",
+  "description": "A political simulation game where you manage resources, keep the population happy, and navigate the challenges of running a government. Based on a visual design, this app replicates the UI and provides a basic game loop.",
+  "requestFramePermissions": []
+}
