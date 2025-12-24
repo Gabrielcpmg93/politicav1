@@ -32,7 +32,7 @@ interface ImprovementModalProps {
     playerMoney: number;
 }
 
-const ImprovementModal: React.FC<ImprovementModalProps> = ({ isOpen, onClose, onPurchase, playerMoney }) => {
+const ImprovementModal: React.FC<ImprovementModalProps> = ({ isOpen, onClose, onPurchase, playerMoney: publicBalance }) => {
     if (!isOpen) {
         return null;
     }
@@ -43,7 +43,7 @@ const ImprovementModal: React.FC<ImprovementModalProps> = ({ isOpen, onClose, on
                 <h2 className="text-3xl font-bold mb-4 text-yellow-400">Melhorar Infraestrutura</h2>
                 <div className="flex-grow overflow-y-auto pr-2 space-y-3">
                     {improvements.map(item => {
-                        const canAfford = playerMoney >= item.cost;
+                        const canAfford = publicBalance >= item.cost;
                         return (
                             <div key={item.id} className="bg-gray-800 p-3 rounded-md border border-gray-600 flex items-center justify-between">
                                 <div className="flex items-center">

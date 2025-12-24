@@ -105,6 +105,13 @@ export const TaxIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+export const BankIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M4 10h16v2H4zm15-2L12 3 5 8v2h14V8zM3 22h18V10H3v12zm6-8h6v4H9v-4z"/>
+    </svg>
+);
+
+
 export const SchoolIcon: React.FC<IconProps> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 3L1 9l11 6 9-4.5V12h-2V10l-7 3.5-9-4.5L12 5l9 4.5V12h2V9L12 3zm-1 9.5V17h2v-4.5l-1-0.5-1 0.5zM12 13.2l5 2.5v3.6l-5-2.5-5 2.5v-3.6l5-2.5z"/>

@@ -9,6 +9,7 @@ import LawModal from './components/LawModal';
 import ApprovedLawsModal from './components/ApprovedLawsModal';
 import ImprovementModal from './components/ImprovementModal';
 import TaxModal from './components/TaxModal';
+import BalanceModal from './components/BalanceModal';
 import Notification from './components/Notification';
 import { initialParliamentLayout } from './constants';
 import type { ParliamentLayout, Law } from './types';
@@ -24,8 +25,7 @@ const App: React.FC = () => {
   const [selectedParty, setSelectedParty] = useState<string>('progressivists');
   
   // Top Header State
-  const [money, setMoney] = useState<number>(102);
-  const [moneyChange, setMoneyChange] = useState<number>(7);
+  const [publicBalance, setPublicBalance] = useState<number>(1000);
   const [population, setPopulation] = useState<number>(97);
   const [happiness, setHappiness] = useState<number>(1);
 
@@ -38,6 +38,7 @@ const App: React.FC = () => {
   const [isApprovedLawsModalOpen, setIsApprovedLawsModalOpen] = useState<boolean>(false);
   const [isImprovementModalOpen, setIsImprovementModalOpen] = useState<boolean>(false);
   const [isTaxModalOpen, setIsTaxModalOpen] = useState<boolean>(false);
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
 
   // Game Logic State
   const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
@@ -72,7 +73,7 @@ const App: React.FC = () => {
   
   const handleNextTurn = useCallback(() => {
     setYear(prev => prev + 1);
-    setMoney(prev => prev + income - expenses + moneyChange);
+    setPublicBalance(prev => prev + income - expenses);
     setPopulation(prev => Math.floor(prev * (1 + Math.random() * 0.01)));
     setHappiness(prev => Math.max(1, Math.min(100, Math.round(prev + (Math.random() - 0.45) * 2))));
     setApproval(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 2)));
@@ -99,7 +100,7 @@ const App: React.FC = () => {
       return newLayout;
     });
 
-  }, [income, expenses, moneyChange]);
+  }, [income, expenses]);
 
   const handlePassDay = () => {
     // Process one pending law per day passed
@@ -133,8 +134,15 @@ const App: React.FC = () => {
   const handleCloseImprovementModal = () => setIsImprovementModalOpen(false);
   const handleOpenTaxModal = () => setIsTaxModalOpen(true);
   const handleCloseTaxModal = () => setIsTaxModalOpen(false);
+  const handleOpenBalanceModal = () => setIsBalanceModalOpen(true);
+  const handleCloseBalanceModal = () => setIsBalanceModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
+    if (publicBalance < budget) {
+      setNotification({ message: 'Saldo público insuficiente para esta lei.', type: 'error' });
+      return;
+    }
+
     const newLaw: Law = {
         id: crypto.randomUUID(),
         name,
@@ -142,9 +150,8 @@ const App: React.FC = () => {
         status: 'pending',
         budget,
     };
-    // Player pays 70% of the budget, 30% is a kickback.
-    const netCost = budget * 0.7;
-    setMoney(prev => prev - Math.floor(netCost));
+    
+    setPublicBalance(prev => prev - budget);
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
@@ -169,8 +176,8 @@ const App: React.FC = () => {
   };
 
   const handlePurchaseImprovement = (cost: number, effects: { supporters?: number; happiness?: number; approval?: number; expenses?: number }, name: string) => {
-    if (money >= cost) {
-      setMoney(prev => prev - cost);
+    if (publicBalance >= cost) {
+      setPublicBalance(prev => prev - cost);
       if (effects.supporters) setSupporters(prev => prev + effects.supporters!);
       if (effects.happiness) setHappiness(prev => Math.min(100, prev + effects.happiness!));
       if (effects.approval) setApproval(prev => Math.min(100, prev + effects.approval!));
@@ -178,7 +185,7 @@ const App: React.FC = () => {
 
       setNotification({ message: `${name} melhorado com sucesso!`, type: 'success' });
     } else {
-      setNotification({ message: 'Dinheiro insuficiente para melhoria.', type: 'error' });
+      setNotification({ message: 'Saldo público insuficiente para melhoria.', type: 'error' });
     }
   };
 
@@ -202,8 +209,6 @@ const App: React.FC = () => {
   return (
     <div className="w-[420px] h-[850px] bg-gray-600 flex flex-col overflow-hidden shadow-2xl border-4 border-gray-700 rounded-2xl">
       <Header
-        money={money}
-        moneyChange={moneyChange}
         population={population}
         happiness={happiness}
       />
@@ -233,6 +238,7 @@ const App: React.FC = () => {
         onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
         onOpenImprovementModal={handleOpenImprovementModal}
         onOpenTaxModal={handleOpenTaxModal}
+        onOpenBalanceModal={handleOpenBalanceModal}
       />
       <Footer
         supporters={supporters}
@@ -258,13 +264,18 @@ const App: React.FC = () => {
         isOpen={isImprovementModalOpen}
         onClose={handleCloseImprovementModal}
         onPurchase={handlePurchaseImprovement}
-        playerMoney={money}
+        playerMoney={publicBalance}
       />
       <TaxModal
         isOpen={isTaxModalOpen}
         onClose={handleCloseTaxModal}
         onSave={handleTaxChange}
         currentRates={taxRates}
+      />
+      <BalanceModal
+        isOpen={isBalanceModalOpen}
+        onClose={handleCloseBalanceModal}
+        balance={publicBalance}
       />
     </div>
   );
