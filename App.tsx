@@ -10,14 +10,22 @@ import ApprovedLawsModal from './components/ApprovedLawsModal';
 import ImprovementModal from './components/ImprovementModal';
 import TaxModal from './components/TaxModal';
 import BalanceModal from './components/BalanceModal';
+import CampaignModal from './components/CampaignModal';
 import Notification from './components/Notification';
-import { initialParliamentLayout } from './constants';
+import { generateParliamentLayout } from './constants';
 import type { ParliamentLayout, Law } from './types';
+import { PersonColor } from './types';
 
 type NotificationState = {
   message: string;
   type: 'success' | 'error';
 } | null;
+
+type Party = {
+  name: string;
+  seats: number;
+  color: PersonColor;
+};
 
 const App: React.FC = () => {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -28,9 +36,15 @@ const App: React.FC = () => {
   const [publicBalance, setPublicBalance] = useState<number>(1000);
   const [population, setPopulation] = useState<number>(97);
   const [happiness, setHappiness] = useState<number>(1);
-
-  // Parliament State
-  const [parliamentLayout, setParliamentLayout] = useState<ParliamentLayout>(initialParliamentLayout);
+  
+  // Party & Parliament State
+  const [parties, setParties] = useState<Party[]>([
+    { name: 'Progressistas', seats: 18, color: PersonColor.Orange }, // Player's party
+    { name: 'Aliança Renovadora', seats: 12, color: PersonColor.Blue },
+    { name: 'Frente Cívica', seats: 10, color: PersonColor.DarkGreen },
+    { name: 'Independentes', seats: 8, color: PersonColor.Yellow },
+  ]);
+  const [parliamentLayout, setParliamentLayout] = useState<ParliamentLayout>(() => generateParliamentLayout(parties));
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
   // Modal States
@@ -39,6 +53,7 @@ const App: React.FC = () => {
   const [isImprovementModalOpen, setIsImprovementModalOpen] = useState<boolean>(false);
   const [isTaxModalOpen, setIsTaxModalOpen] = useState<boolean>(false);
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState<boolean>(false);
+  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState<boolean>(false);
 
   // Game Logic State
   const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
@@ -77,38 +92,20 @@ const App: React.FC = () => {
     setPopulation(prev => Math.floor(prev * (1 + Math.random() * 0.01)));
     setHappiness(prev => Math.max(1, Math.min(100, Math.round(prev + (Math.random() - 0.45) * 2))));
     setApproval(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 2)));
-
-    // Randomly add a star to a person
-    setParliamentLayout(prevLayout => {
-      const newLayout = JSON.parse(JSON.stringify(prevLayout));
-      const flatPeople = newLayout.flat();
-      const nonStarPeople = flatPeople.filter((p: any) => p.color !== 'empty' && p.statusIcon !== 'star');
-      if(nonStarPeople.length > 0) {
-        const randomPerson = nonStarPeople[Math.floor(Math.random() * nonStarPeople.length)];
-        
-        for(let r = 0; r < newLayout.length; r++) {
-            for(let c = 0; c < newLayout[r].length; c++) {
-                if(newLayout[r][c].statusIcon === 'star') {
-                    delete newLayout[r][c].statusIcon; // Remove old stars
-                }
-                if(newLayout[r][c].id === randomPerson.id) {
-                    newLayout[r][c].statusIcon = 'star';
-                }
-            }
-        }
-      }
-      return newLayout;
-    });
-
   }, [income, expenses]);
 
   const handlePassDay = () => {
-    // Process one pending law per day passed
+    const nextDay = day === 28 ? 1 : day + 1;
+    
+    if (nextDay === 10) {
+      setIsCampaignModalOpen(true);
+    }
+
     if (pendingLaws.length > 0) {
       const lawToProcess = pendingLaws[0];
       const remainingLaws = pendingLaws.slice(1);
       
-      const isApproved = true; // All laws are now approved
+      const isApproved = true;
 
       if (isApproved) {
           setLawsPassed(prev => prev + 1);
@@ -122,7 +119,7 @@ const App: React.FC = () => {
       setDay(prevDay => prevDay + 1);
     } else {
       setDay(1);
-      handleNextTurn(); // This increments the year
+      handleNextTurn();
     }
   };
 
@@ -136,6 +133,7 @@ const App: React.FC = () => {
   const handleCloseTaxModal = () => setIsTaxModalOpen(false);
   const handleOpenBalanceModal = () => setIsBalanceModalOpen(true);
   const handleCloseBalanceModal = () => setIsBalanceModalOpen(false);
+  const handleCloseCampaignModal = () => setIsCampaignModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     if (publicBalance < budget) {
@@ -143,36 +141,23 @@ const App: React.FC = () => {
       return;
     }
 
-    const newLaw: Law = {
-        id: crypto.randomUUID(),
-        name,
-        description,
-        status: 'pending',
-        budget,
-    };
-    
+    const newLaw: Law = { id: crypto.randomUUID(), name, description, status: 'pending', budget };
     setPublicBalance(prev => prev - budget);
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
   };
 
-  const handlePersonClick = (personId: string) => {
-    setSelectedPersonId(prevId => (prevId === personId ? null : personId));
-  };
+  const handlePersonClick = (personId: string) => setSelectedPersonId(prevId => (prevId === personId ? null : personId));
   
   const handleConvince = () => {
-    // Placeholder for convince logic
-    console.log(`Convincing person ${selectedPersonId}`);
     setNotification({ message: 'Você tentou convencer o parlamentar.', type: 'success' });
-    setSelectedPersonId(null); // Deselect after action
+    setSelectedPersonId(null);
   };
 
   const handleBribe = () => {
-    // Placeholder for bribe logic
-    console.log(`Bribing person ${selectedPersonId}`);
     setNotification({ message: 'Você tentou subornar o parlamentar.', type: 'error' });
-    setSelectedPersonId(null); // Deselect after action
+    setSelectedPersonId(null);
   };
 
   const handlePurchaseImprovement = (cost: number, effects: { supporters?: number; happiness?: number; approval?: number; expenses?: number }, name: string) => {
@@ -182,7 +167,6 @@ const App: React.FC = () => {
       if (effects.happiness) setHappiness(prev => Math.min(100, prev + effects.happiness!));
       if (effects.approval) setApproval(prev => Math.min(100, prev + effects.approval!));
       if (effects.expenses) setExpenses(prev => Math.max(0, prev + effects.expenses!));
-
       setNotification({ message: `${name} melhorado com sucesso!`, type: 'success' });
     } else {
       setNotification({ message: 'Saldo público insuficiente para melhoria.', type: 'error' });
@@ -192,15 +176,67 @@ const App: React.FC = () => {
   const handleTaxChange = (newRates: { income: number; corporate: number; sales: number }) => {
     const oldAverage = (taxRates.income + taxRates.corporate + taxRates.sales) / 3;
     const newAverage = (newRates.income + newRates.corporate + newRates.sales) / 3;
-    const happinessChange = Math.round(oldAverage - newAverage); // More tax -> lower happiness
+    const happinessChange = Math.round(oldAverage - newAverage);
     setHappiness(prev => Math.max(1, Math.min(100, prev + happinessChange)));
 
     setTaxRates(newRates);
-    setNotification({
-        message: `Impostos atualizados! Felicidade ${happinessChange >= 0 ? '+' : ''}${happinessChange}.`,
-        type: 'success',
-    });
+    setNotification({ message: `Impostos atualizados! Felicidade ${happinessChange >= 0 ? '+' : ''}${happinessChange}.`, type: 'success' });
   };
+
+  const handleRunCampaign = (cost: number, potentialGain: number) => {
+    if (publicBalance < cost) {
+        setNotification({ message: 'Saldo público insuficiente para esta campanha.', type: 'error' });
+        return;
+    }
+    setPublicBalance(prev => prev - cost);
+
+    const baseInfluence = (approval / 100) + (supporters / 50) - 0.5; // From -0.5 to ~1.5
+    const randomFactor = (Math.random() - 0.5) * 0.5; // +/- 25% variance
+    const totalInfluence = baseInfluence + potentialGain + randomFactor;
+    
+    let seatsFlipped = Math.round(totalInfluence * 5); // Max ~10 seats can flip
+
+    setParties(currentParties => {
+        const newParties = JSON.parse(JSON.stringify(currentParties));
+        const playerParty = newParties[0];
+        const oppositionParties = newParties.slice(1);
+
+        playerParty.seats += seatsFlipped;
+
+        // Distribute losses/gains among opposition
+        let seatsToDistribute = -seatsFlipped;
+        while(seatsToDistribute !== 0) {
+            const partyToChange = oppositionParties[Math.floor(Math.random() * oppositionParties.length)];
+            if(seatsToDistribute > 0 && partyToChange.seats < 48) { // opposition gains seats
+                partyToChange.seats++;
+                seatsToDistribute--;
+            } else if (seatsToDistribute < 0 && partyToChange.seats > 0) { // opposition loses seats
+                partyToChange.seats--;
+                seatsToDistribute++;
+            }
+            // Break if in a deadlock
+            if (!oppositionParties.some(p => (seatsToDistribute > 0 && p.seats < 48) || (seatsToDistribute < 0 && p.seats > 0))) {
+                break;
+            }
+        }
+        
+        // Normalize seat counts to ensure they sum to 48
+        const totalSeats = newParties.reduce((sum: number, p: Party) => sum + p.seats, 0);
+        const discrepancy = 48 - totalSeats;
+        if (discrepancy !== 0) {
+            const partyToAdjust = newParties.find((p: Party) => p.seats > 0);
+            if(partyToAdjust) partyToAdjust.seats += discrepancy;
+        }
+        newParties.forEach((p: Party) => p.seats = Math.max(0, p.seats));
+
+        setParliamentLayout(generateParliamentLayout(newParties));
+        setNotification({ message: `Campanha concluída! Você ${seatsFlipped >= 0 ? 'ganhou' : 'perdeu'} ${Math.abs(seatsFlipped)} assento(s).`, type: seatsFlipped >= 0 ? 'success' : 'error' });
+        return newParties;
+    });
+
+    setSupporters(prev => prev + seatsFlipped);
+  };
+
 
   if (!gameStarted) {
     return <Menu onStartGame={handleStartGame} />;
@@ -208,28 +244,15 @@ const App: React.FC = () => {
 
   return (
     <div className="w-[420px] h-[850px] bg-gray-600 flex flex-col overflow-hidden shadow-2xl border-4 border-gray-700 rounded-2xl">
-      <Header
-        population={population}
-        happiness={happiness}
-      />
+      <Header population={population} happiness={happiness} />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
         <div className="absolute bottom-36 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
         </div>
-        <Parliament 
-          layout={parliamentLayout} 
-          selectedPersonId={selectedPersonId}
-          onPersonClick={handlePersonClick}
-        />
-        {notification && (
-            <Notification 
-                message={notification.message}
-                type={notification.type}
-                onClose={() => setNotification(null)}
-            />
-        )}
+        <Parliament layout={parliamentLayout} selectedPersonId={selectedPersonId} onPersonClick={handlePersonClick} />
+        {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
       </main>
-      <Controls 
+      <Controls
         selectedPersonId={selectedPersonId}
         onOpenLawModal={handleOpenLawModal}
         onPassDay={handlePassDay}
@@ -240,43 +263,13 @@ const App: React.FC = () => {
         onOpenTaxModal={handleOpenTaxModal}
         onOpenBalanceModal={handleOpenBalanceModal}
       />
-      <Footer
-        supporters={supporters}
-        income={income}
-        incomeChange={incomeChange}
-        expenses={expenses}
-        approval={approval}
-        lawsPassed={lawsPassed}
-        year={year}
-        day={day}
-      />
-      <LawModal 
-        isOpen={isLawModalOpen}
-        onClose={handleCloseLawModal}
-        onProposeLaw={handleProposeLaw}
-      />
-      <ApprovedLawsModal 
-        isOpen={isApprovedLawsModalOpen}
-        onClose={handleCloseApprovedLawsModal}
-        laws={approvedLaws}
-      />
-      <ImprovementModal
-        isOpen={isImprovementModalOpen}
-        onClose={handleCloseImprovementModal}
-        onPurchase={handlePurchaseImprovement}
-        playerMoney={publicBalance}
-      />
-      <TaxModal
-        isOpen={isTaxModalOpen}
-        onClose={handleCloseTaxModal}
-        onSave={handleTaxChange}
-        currentRates={taxRates}
-      />
-      <BalanceModal
-        isOpen={isBalanceModalOpen}
-        onClose={handleCloseBalanceModal}
-        balance={publicBalance}
-      />
+      <Footer supporters={supporters} income={income} incomeChange={incomeChange} expenses={expenses} approval={approval} lawsPassed={lawsPassed} year={year} day={day} />
+      <LawModal isOpen={isLawModalOpen} onClose={handleCloseLawModal} onProposeLaw={handleProposeLaw} />
+      <ApprovedLawsModal isOpen={isApprovedLawsModalOpen} onClose={handleCloseApprovedLawsModal} laws={approvedLaws} />
+      <ImprovementModal isOpen={isImprovementModalOpen} onClose={handleCloseImprovementModal} onPurchase={handlePurchaseImprovement} playerMoney={publicBalance} />
+      <TaxModal isOpen={isTaxModalOpen} onClose={handleCloseTaxModal} onSave={handleTaxChange} currentRates={taxRates} />
+      <BalanceModal isOpen={isBalanceModalOpen} onClose={handleCloseBalanceModal} balance={publicBalance} />
+      <CampaignModal isOpen={isCampaignModalOpen} onClose={handleCloseCampaignModal} parties={parties} onRunCampaign={handleRunCampaign} />
     </div>
   );
 };

@@ -12,6 +12,8 @@ export interface PersonData {
   id: string;
   color: PersonColor;
   statusIcon?: 'clock' | 'star';
+  name?: string;
+  party?: string;
 }
 
 export type ParliamentLayout = PersonData[][];
