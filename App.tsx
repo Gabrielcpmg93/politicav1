@@ -6,6 +6,7 @@ import Controls from './components/Controls';
 import Footer from './components/Footer';
 import Menu from './components/Menu';
 import LawModal from './components/LawModal';
+import ApprovedLawsModal from './components/ApprovedLawsModal';
 import Notification from './components/Notification';
 import { initialParliamentLayout } from './constants';
 import type { ParliamentLayout, Law } from './types';
@@ -32,7 +33,9 @@ const App: React.FC = () => {
 
   // Lawmaking State
   const [isLawModalOpen, setIsLawModalOpen] = useState<boolean>(false);
+  const [isApprovedLawsModalOpen, setIsApprovedLawsModalOpen] = useState<boolean>(false);
   const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
+  const [approvedLaws, setApprovedLaws] = useState<Law[]>([]);
   const [notification, setNotification] = useState<NotificationState>(null);
 
   // Footer State
@@ -88,13 +91,12 @@ const App: React.FC = () => {
       const lawToProcess = pendingLaws[0];
       const remainingLaws = pendingLaws.slice(1);
       
-      const isApproved = Math.random() <= 0.4; // 40% chance of approval (2 in 5)
+      const isApproved = true; // All laws are now approved
 
       if (isApproved) {
           setLawsPassed(prev => prev + 1);
+          setApprovedLaws(prev => [...prev, { ...lawToProcess, status: 'approved' }]);
           setNotification({ message: `Lei "${lawToProcess.name}" APROVADA!`, type: 'success' });
-      } else {
-          setNotification({ message: `Lei "${lawToProcess.name}" REJEITADA.`, type: 'error' });
       }
       setPendingLaws(remainingLaws);
     }
@@ -109,6 +111,9 @@ const App: React.FC = () => {
 
   const handleOpenLawModal = () => setIsLawModalOpen(true);
   const handleCloseLawModal = () => setIsLawModalOpen(false);
+  const handleOpenApprovedLawsModal = () => setIsApprovedLawsModalOpen(true);
+  const handleCloseApprovedLawsModal = () => setIsApprovedLawsModalOpen(false);
+
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     const newLaw: Law = {
         id: crypto.randomUUID(),
@@ -154,6 +159,7 @@ const App: React.FC = () => {
         moneyChange={moneyChange}
         population={population}
         happiness={happiness}
+        onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
       />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
         <div className="absolute bottom-36 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
@@ -193,6 +199,11 @@ const App: React.FC = () => {
         isOpen={isLawModalOpen}
         onClose={handleCloseLawModal}
         onProposeLaw={handleProposeLaw}
+      />
+      <ApprovedLawsModal 
+        isOpen={isApprovedLawsModalOpen}
+        onClose={handleCloseApprovedLawsModal}
+        laws={approvedLaws}
       />
     </div>
   );
