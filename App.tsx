@@ -28,6 +28,7 @@ const App: React.FC = () => {
 
   // Parliament State
   const [parliamentLayout, setParliamentLayout] = useState<ParliamentLayout>(initialParliamentLayout);
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
 
   // Lawmaking State
   const [isLawModalOpen, setIsLawModalOpen] = useState<boolean>(false);
@@ -123,7 +124,25 @@ const App: React.FC = () => {
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
   };
+
+  const handlePersonClick = (personId: string) => {
+    setSelectedPersonId(prevId => (prevId === personId ? null : personId));
+  };
   
+  const handleConvince = () => {
+    // Placeholder for convince logic
+    console.log(`Convincing person ${selectedPersonId}`);
+    setNotification({ message: 'Você tentou convencer o parlamentar.', type: 'success' });
+    setSelectedPersonId(null); // Deselect after action
+  };
+
+  const handleBribe = () => {
+    // Placeholder for bribe logic
+    console.log(`Bribing person ${selectedPersonId}`);
+    setNotification({ message: 'Você tentou subornar o parlamentar.', type: 'error' });
+    setSelectedPersonId(null); // Deselect after action
+  };
+
   if (!gameStarted) {
     return <Menu onStartGame={handleStartGame} />;
   }
@@ -137,10 +156,14 @@ const App: React.FC = () => {
         happiness={happiness}
       />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
-        <div className="absolute bottom-40 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center">
+        <div className="absolute bottom-36 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
         </div>
-        <Parliament layout={parliamentLayout} />
+        <Parliament 
+          layout={parliamentLayout} 
+          selectedPersonId={selectedPersonId}
+          onPersonClick={handlePersonClick}
+        />
         {notification && (
             <Notification 
                 message={notification.message}
@@ -150,8 +173,11 @@ const App: React.FC = () => {
         )}
       </main>
       <Controls 
+        selectedPersonId={selectedPersonId}
         onOpenLawModal={handleOpenLawModal}
         onPassDay={handlePassDay}
+        onConvince={handleConvince}
+        onBribe={handleBribe}
       />
       <Footer
         supporters={supporters}

@@ -1,13 +1,37 @@
 
 import React from 'react';
-import { HourglassIcon, LawIcon } from './icons';
+import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon } from './icons';
 
 interface ControlsProps {
   onPassDay: () => void;
   onOpenLawModal: () => void;
+  selectedPersonId: string | null;
+  onConvince: () => void;
+  onBribe: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal }) => {
+const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, selectedPersonId, onConvince, onBribe }) => {
+  if (selectedPersonId) {
+    return (
+      <div className="bg-gray-500 p-2 h-[104px] flex items-center justify-center space-x-4">
+        <button
+          onClick={onConvince}
+          className="w-32 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center px-2 bg-green-600 border-b-4 border-green-800 hover:bg-green-700 active:border-b-2"
+        >
+          <HandshakeIcon className="w-8 h-8 mr-2" />
+          Convencer
+        </button>
+        <button
+          onClick={onBribe}
+          className="w-32 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center px-2 bg-red-600 border-b-4 border-red-800 hover:bg-red-700 active:border-b-2"
+        >
+          <MoneyBagIcon className="w-8 h-8 mr-2" />
+          Subornar
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-6">
       <button

@@ -5,11 +5,13 @@ import Person from './Person';
 
 interface ParliamentProps {
   layout: ParliamentLayout;
+  selectedPersonId: string | null;
+  onPersonClick: (id: string) => void;
 }
 
-const Parliament: React.FC<ParliamentProps> = ({ layout }) => {
+const Parliament: React.FC<ParliamentProps> = ({ layout, selectedPersonId, onPersonClick }) => {
   return (
-    <div className="w-full max-w-sm flex flex-col gap-1.5 p-2">
+    <div className="w-full max-w-sm flex flex-col gap-1.5 p-2 z-10">
       {layout.map((row, rowIndex) => (
         <div
           key={rowIndex}
@@ -17,7 +19,12 @@ const Parliament: React.FC<ParliamentProps> = ({ layout }) => {
         >
           <div className="flex justify-around w-full">
             {row.map((person) => (
-              <Person key={person.id} color={person.color} statusIcon={person.statusIcon} />
+              <Person 
+                key={person.id} 
+                {...person} 
+                isSelected={selectedPersonId === person.id}
+                onClick={() => onPersonClick(person.id)}
+              />
             ))}
           </div>
         </div>
