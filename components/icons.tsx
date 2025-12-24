@@ -82,6 +82,16 @@ export const LawIcon: React.FC<IconProps> = ({ className }) => (
   </svg>
 );
 
+export const ListIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </svg>
+);
 
 export const ClockIcon: React.FC<IconProps> = ({ className }) => (
   <svg className={className} viewBox="0 0 20 20" fill="currentColor">
@@ -97,7 +107,7 @@ export const StarIcon: React.FC<IconProps> = ({ className }) => (
 
 export const HandshakeIcon: React.FC<IconProps> = ({ className }) => (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55M4.929,18.071c-1.562-1.562-1.562-4.095,0-5.657l3.535-3.536c1.562-1.562,4.095-1.562,5.657,0l3.535,3.536c1.562,1.562,1.562,4.095,0,5.657l-3.535,3.536c-1.562,1.562-4.095,1.562-5.657,0l-3.535-3.536z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55C12 11.55 12 11.55 12 11.55M4.929,18.071c-1.562-1.562-1.562-4.095,0-5.657l3.535-3.536c1.562-1.562,4.095-1.562,5.657,0l3.535,3.536c1.562,1.562,1.562,4.095,0,5.657l-3.535,3.536c-1.562,1.562-4.095-1.562-5.657,0l-3.535-3.536z" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172,12.728l5.657-5.657" />
     </svg>
 );

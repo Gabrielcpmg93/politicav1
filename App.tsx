@@ -159,7 +159,6 @@ const App: React.FC = () => {
         moneyChange={moneyChange}
         population={population}
         happiness={happiness}
-        onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
       />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
         <div className="absolute bottom-36 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
@@ -184,6 +183,7 @@ const App: React.FC = () => {
         onPassDay={handlePassDay}
         onConvince={handleConvince}
         onBribe={handleBribe}
+        onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
       />
       <Footer
         supporters={supporters}

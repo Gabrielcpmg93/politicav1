@@ -1,16 +1,15 @@
 
 import React from 'react';
-import { CoinIcon, PopulationIcon, SmileyIcon, GlobeIcon, SettingsIcon, LawIcon } from './icons';
+import { CoinIcon, PopulationIcon, SmileyIcon, GlobeIcon, SettingsIcon } from './icons';
 
 interface HeaderProps {
   money: number;
   moneyChange: number;
   population: number;
   happiness: number;
-  onOpenApprovedLawsModal: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ money, moneyChange, population, happiness, onOpenApprovedLawsModal }) => {
+const Header: React.FC<HeaderProps> = ({ money, moneyChange, population, happiness }) => {
   return (
     <header className="bg-gray-700 text-white shadow-md z-10">
       <div className="p-2 flex justify-between items-center">
@@ -32,11 +31,6 @@ const Header: React.FC<HeaderProps> = ({ money, moneyChange, population, happine
           </div>
         </div>
         <div className="flex items-center space-x-1">
-          <button 
-            onClick={onOpenApprovedLawsModal}
-            className="p-1 bg-gray-800 bg-opacity-50 rounded-md border border-gray-600 hover:bg-opacity-75">
-            <LawIcon className="w-8 h-8 text-gray-400" />
-          </button>
           <button className="p-1 bg-gray-800 bg-opacity-50 rounded-md border border-gray-600 hover:bg-opacity-75">
             <GlobeIcon className="w-8 h-8 text-blue-400" />
           </button>
