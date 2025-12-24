@@ -99,6 +99,25 @@ export const BuildingIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+export const SchoolIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3L1 9l11 6 9-4.5V12h-2V10l-7 3.5-9-4.5L12 5l9 4.5V12h2V9L12 3zm-1 9.5V17h2v-4.5l-1-0.5-1 0.5zM12 13.2l5 2.5v3.6l-5-2.5-5 2.5v-3.6l5-2.5z"/>
+    </svg>
+);
+
+export const HospitalIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 6v12H6V6h12zM11 11H9v2h2v2h2v-2h2v-2h-2V9h-2v2zm9-5H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2z"/>
+    </svg>
+);
+
+export const SanitationIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 4.17 4.42 9.92 6.24 12.11.4.48 1.13.48 1.53 0C14.58 18.92 19 13.17 19 9c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>
+);
+
+
 export const ClockIcon: React.FC<IconProps> = ({ className }) => (
   <svg className={className} viewBox="0 0 20 20" fill="currentColor">
     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414L7 8.586V12h1.5V9.414l2.207-2.207z" clipRule="evenodd" />

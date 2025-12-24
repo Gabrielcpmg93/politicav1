@@ -6,13 +6,13 @@ interface ControlsProps {
   onPassDay: () => void;
   onOpenLawModal: () => void;
   onOpenApprovedLawsModal: () => void;
-  onImproveBuildings: () => void;
+  onOpenImprovementModal: () => void;
   selectedPersonId: string | null;
   onConvince: () => void;
   onBribe: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onImproveBuildings, selectedPersonId, onConvince, onBribe }) => {
+const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, selectedPersonId, onConvince, onBribe }) => {
   if (selectedPersonId) {
     return (
       <div className="bg-gray-500 p-2 h-[104px] flex items-center justify-center space-x-4">
@@ -37,7 +37,7 @@ const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenAp
   return (
     <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-2">
       <button
-        onClick={onImproveBuildings}
+        onClick={onOpenImprovementModal}
         className={`
           w-16 h-16 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center
           bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2

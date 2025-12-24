@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Menu from './components/Menu';
 import LawModal from './components/LawModal';
 import ApprovedLawsModal from './components/ApprovedLawsModal';
+import ImprovementModal from './components/ImprovementModal';
 import Notification from './components/Notification';
 import { initialParliamentLayout } from './constants';
 import type { ParliamentLayout, Law } from './types';
@@ -34,6 +35,7 @@ const App: React.FC = () => {
   // Lawmaking State
   const [isLawModalOpen, setIsLawModalOpen] = useState<boolean>(false);
   const [isApprovedLawsModalOpen, setIsApprovedLawsModalOpen] = useState<boolean>(false);
+  const [isImprovementModalOpen, setIsImprovementModalOpen] = useState<boolean>(false);
   const [pendingLaws, setPendingLaws] = useState<Law[]>([]);
   const [approvedLaws, setApprovedLaws] = useState<Law[]>([]);
   const [notification, setNotification] = useState<NotificationState>(null);
@@ -113,6 +115,8 @@ const App: React.FC = () => {
   const handleCloseLawModal = () => setIsLawModalOpen(false);
   const handleOpenApprovedLawsModal = () => setIsApprovedLawsModalOpen(true);
   const handleCloseApprovedLawsModal = () => setIsApprovedLawsModalOpen(false);
+  const handleOpenImprovementModal = () => setIsImprovementModalOpen(true);
+  const handleCloseImprovementModal = () => setIsImprovementModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     const newLaw: Law = {
@@ -148,14 +152,17 @@ const App: React.FC = () => {
     setSelectedPersonId(null); // Deselect after action
   };
 
-  const handleImproveBuildings = () => {
-    const improvementCost = 50;
-    if (money >= improvementCost) {
-      setMoney(prev => prev - improvementCost);
-      setSupporters(prev => prev + 1);
-      setNotification({ message: 'Prédios e casas melhorados! +1 Apoiador.', type: 'success' });
+  const handlePurchaseImprovement = (cost: number, effects: { supporters?: number; happiness?: number; approval?: number; expenses?: number }, name: string) => {
+    if (money >= cost) {
+      setMoney(prev => prev - cost);
+      if (effects.supporters) setSupporters(prev => prev + effects.supporters!);
+      if (effects.happiness) setHappiness(prev => Math.min(100, prev + effects.happiness!));
+      if (effects.approval) setApproval(prev => Math.min(100, prev + effects.approval!));
+      if (effects.expenses) setExpenses(prev => Math.max(0, prev + effects.expenses!));
+
+      setNotification({ message: `${name} melhorado com sucesso!`, type: 'success' });
     } else {
-      setNotification({ message: 'Dinheiro insuficiente para melhorias.', type: 'error' });
+      setNotification({ message: 'Dinheiro insuficiente para melhoria.', type: 'error' });
     }
   };
 
@@ -195,7 +202,7 @@ const App: React.FC = () => {
         onConvince={handleConvince}
         onBribe={handleBribe}
         onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
-        onImproveBuildings={handleImproveBuildings}
+        onOpenImprovementModal={handleOpenImprovementModal}
       />
       <Footer
         supporters={supporters}
@@ -216,6 +223,12 @@ const App: React.FC = () => {
         isOpen={isApprovedLawsModalOpen}
         onClose={handleCloseApprovedLawsModal}
         laws={approvedLaws}
+      />
+      <ImprovementModal
+        isOpen={isImprovementModalOpen}
+        onClose={handleCloseImprovementModal}
+        onPurchase={handlePurchaseImprovement}
+        playerMoney={money}
       />
     </div>
   );
