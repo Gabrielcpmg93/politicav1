@@ -4,12 +4,13 @@ import React from 'react';
 interface LawModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onProposeLaw: (name: string, description: string) => void;
+    onProposeLaw: (name: string, description: string, budget: number) => void;
 }
 
 const LawModal: React.FC<LawModalProps> = ({ isOpen, onClose, onProposeLaw }) => {
     const [name, setName] = React.useState('');
     const [description, setDescription] = React.useState('');
+    const [budget, setBudget] = React.useState(1);
 
     if (!isOpen) {
         return null;
@@ -17,9 +18,10 @@ const LawModal: React.FC<LawModalProps> = ({ isOpen, onClose, onProposeLaw }) =>
 
     const handleSubmit = () => {
         if (name.trim() && description.trim()) {
-            onProposeLaw(name, description);
+            onProposeLaw(name, description, budget);
             setName('');
             setDescription('');
+            setBudget(1);
         }
     };
 
@@ -48,6 +50,20 @@ const LawModal: React.FC<LawModalProps> = ({ isOpen, onClose, onProposeLaw }) =>
                             onChange={(e) => setDescription(e.target.value)}
                             className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                             placeholder="Descreva os objetivos e efeitos da lei..."
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="law-budget" className="block text-sm font-medium text-gray-300 mb-1">
+                            Verba para a Lei: <span className="font-bold text-yellow-400">{budget} Milhão</span>
+                        </label>
+                        <input
+                            type="range"
+                            id="law-budget"
+                            min="1"
+                            max="50"
+                            value={budget}
+                            onChange={(e) => setBudget(parseInt(e.target.value, 10))}
+                            className="w-full h-3 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-yellow-500"
                         />
                     </div>
                 </div>

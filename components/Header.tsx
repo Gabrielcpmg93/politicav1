@@ -11,13 +11,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ money, moneyChange, population, happiness }) => {
   return (
-    <header className="relative bg-gray-700 text-white shadow-md z-10">
-      <div className="absolute inset-0 flex">
-        <div className="w-1/3 bg-red-600"></div>
-        <div className="w-1/3 bg-white"></div>
-        <div className="w-1/3 bg-green-600"></div>
-      </div>
-      <div className="relative p-2 flex justify-between items-center">
+    <header className="bg-gray-700 text-white shadow-md z-10">
+      <div className="p-2 flex justify-between items-center">
         <div className="flex items-center space-x-4 text-sm font-bold">
           <div className="flex items-center bg-black bg-opacity-30 p-1 rounded">
             <CoinIcon className="w-8 h-8 text-yellow-400" />

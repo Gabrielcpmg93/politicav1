@@ -17,7 +17,6 @@ type NotificationState = {
 
 const App: React.FC = () => {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
-  const [startYear, setStartYear] = useState<number>(2026);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedParty, setSelectedParty] = useState<string>('progressivists');
   
@@ -42,11 +41,10 @@ const App: React.FC = () => {
   const [expenses, setExpenses] = useState<number>(50);
   const [approval, setApproval] = useState<number>(8.68);
   const [lawsPassed, setLawsPassed] = useState<number>(7);
-  const [year, setYear] = useState<number>(startYear);
+  const [year, setYear] = useState<number>(2026);
   const [day, setDay] = useState<number>(1);
 
   const handleStartGame = (sYear: number, party: string) => {
-    setStartYear(sYear);
     setYear(sYear);
     setSelectedParty(party);
     setGameStarted(true);
@@ -89,7 +87,7 @@ const App: React.FC = () => {
       const lawToProcess = pendingLaws[0];
       const remainingLaws = pendingLaws.slice(1);
       
-      const isApproved = Math.random() > 0.5; // 50% chance of approval
+      const isApproved = Math.random() <= 0.4; // 40% chance of approval (2 in 5)
 
       if (isApproved) {
           setLawsPassed(prev => prev + 1);
@@ -110,13 +108,17 @@ const App: React.FC = () => {
 
   const handleOpenLawModal = () => setIsLawModalOpen(true);
   const handleCloseLawModal = () => setIsLawModalOpen(false);
-  const handleProposeLaw = (name: string, description: string) => {
+  const handleProposeLaw = (name: string, description: string, budget: number) => {
     const newLaw: Law = {
         id: crypto.randomUUID(),
         name,
         description,
-        status: 'pending'
+        status: 'pending',
+        budget,
     };
+    // 30% kickback from the law's budget
+    const kickback = budget * 0.3;
+    setMoney(prev => prev + Math.floor(kickback));
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
@@ -135,10 +137,10 @@ const App: React.FC = () => {
         happiness={happiness}
       />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
-        <Parliament layout={parliamentLayout} />
         <div className="absolute bottom-40 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
         </div>
+        <Parliament layout={parliamentLayout} />
         {notification && (
             <Notification 
                 message={notification.message}
