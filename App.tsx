@@ -122,9 +122,9 @@ const App: React.FC = () => {
         status: 'pending',
         budget,
     };
-    // 30% kickback from the law's budget
-    const kickback = budget * 0.3;
-    setMoney(prev => prev + Math.floor(kickback));
+    // Player pays 70% of the budget, 30% is a kickback.
+    const netCost = budget * 0.7;
+    setMoney(prev => prev - Math.floor(netCost));
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
@@ -146,6 +146,17 @@ const App: React.FC = () => {
     console.log(`Bribing person ${selectedPersonId}`);
     setNotification({ message: 'Você tentou subornar o parlamentar.', type: 'error' });
     setSelectedPersonId(null); // Deselect after action
+  };
+
+  const handleImproveBuildings = () => {
+    const improvementCost = 50;
+    if (money >= improvementCost) {
+      setMoney(prev => prev - improvementCost);
+      setSupporters(prev => prev + 1);
+      setNotification({ message: 'Prédios e casas melhorados! +1 Apoiador.', type: 'success' });
+    } else {
+      setNotification({ message: 'Dinheiro insuficiente para melhorias.', type: 'error' });
+    }
   };
 
   if (!gameStarted) {
@@ -184,6 +195,7 @@ const App: React.FC = () => {
         onConvince={handleConvince}
         onBribe={handleBribe}
         onOpenApprovedLawsModal={handleOpenApprovedLawsModal}
+        onImproveBuildings={handleImproveBuildings}
       />
       <Footer
         supporters={supporters}

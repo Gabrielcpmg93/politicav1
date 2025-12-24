@@ -93,6 +93,12 @@ export const ListIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+export const BuildingIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
+    </svg>
+);
+
 export const ClockIcon: React.FC<IconProps> = ({ className }) => (
   <svg className={className} viewBox="0 0 20 20" fill="currentColor">
     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414L7 8.586V12h1.5V9.414l2.207-2.207z" clipRule="evenodd" />
