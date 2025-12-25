@@ -123,36 +123,13 @@ const App: React.FC = () => {
       const lawToProcess = pendingLaws[0];
       const remainingLaws = pendingLaws.slice(1);
       
-      const authorParty = parties.find(p => p.name === lawToProcess.author);
-      const authorPartySeats = authorParty?.seats || 0;
+      // All laws are now automatically approved as per user request.
+      setLawsPassed(prev => prev + 1);
+      setApprovedLaws(prev => [...prev, { ...lawToProcess, status: 'approved' }]);
+      setPublicBalance(prev => prev + lawToProcess.budget);
+      setNotification({ message: `Lei "${lawToProcess.name}" aprovada! Verba de ${lawToProcess.budget}M adicionada.`, type: 'success' });
       
-      const baseChance = 40;
-      const partySeatBonus = (authorPartySeats / 48) * 40; // Bonus from party size
-      
-      let presidentBonus = 0;
-      if (chamberPresidentId) {
-        const president = parliamentLayout.flat().find(p => p.id === chamberPresidentId);
-        if (president?.party === lawToProcess.author) {
-          presidentBonus = 15; // President from the same party gives a big bonus
-        }
-      }
-      
-      const isPlayerLaw = lawToProcess.author === (parties.find(p => p.color === playerPartyColor)?.name);
-      const finalPersuasionBonus = isPlayerLaw ? persuasionBonus : 0;
-      
-      const totalChance = baseChance + partySeatBonus + presidentBonus + finalPersuasionBonus;
-      const isApproved = Math.random() * 100 < totalChance;
-      
-      setPersuasionBonus(0); // Persuasion bonus is a one-time use
-
-      if (isApproved) {
-          setLawsPassed(prev => prev + 1);
-          setApprovedLaws(prev => [...prev, { ...lawToProcess, status: 'approved' }]);
-          setPublicBalance(prev => prev + lawToProcess.budget);
-          setNotification({ message: `Lei "${lawToProcess.name}" aprovada! Verba de ${lawToProcess.budget}M adicionada.`, type: 'success' });
-      } else {
-          setNotification({ message: `A lei "${lawToProcess.name}" foi rejeitada pelo parlamento.`, type: 'error' });
-      }
+      setPersuasionBonus(0); // Reset persuasion bonus even if not used for voting chance
       setPendingLaws(remainingLaws);
     }
 
