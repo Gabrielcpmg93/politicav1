@@ -157,3 +157,10 @@ export const MoneyBagIcon: React.FC<IconProps> = ({ className }) => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2,10h20" />
     </svg>
 );
+
+export const NewspaperIcon: React.FC<IconProps> = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H5V5h14v14z"/>
+        <path d="M7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
+    </svg>
+);

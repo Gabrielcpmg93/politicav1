@@ -28,3 +28,12 @@ export interface Law {
   budget: number;
   author: string;
 }
+
+export interface NewsArticle {
+  id: string;
+  headline: string;
+  body: string;
+  day: number;
+  month: number;
+  year: number;
+}

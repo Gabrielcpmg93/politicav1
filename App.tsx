@@ -14,9 +14,10 @@ import CampaignModal from './components/CampaignModal';
 import Notification from './components/Notification';
 import PresidentModal from './components/PresidentModal';
 import SponsorshipModal from './components/SponsorshipModal';
+import NewspaperModal from './components/NewspaperModal';
 import { generateParliamentLayout } from './constants';
 import { AI_LAW_PROPOSALS } from './aiLawProposals';
-import type { ParliamentLayout, Law, PersonData } from './types';
+import type { ParliamentLayout, Law, PersonData, NewsArticle } from './types';
 import { PersonColor } from './types';
 
 type NotificationState = {
@@ -61,6 +62,7 @@ const App: React.FC = () => {
   const [isCampaignModalOpen, setIsCampaignModalOpen] = useState<boolean>(false);
   const [isPresidentModalOpen, setIsPresidentModalOpen] = useState<boolean>(false);
   const [isSponsorshipModalOpen, setIsSponsorshipModalOpen] = useState<boolean>(false);
+  const [isNewspaperModalOpen, setIsNewspaperModalOpen] = useState<boolean>(false);
 
 
   // Game Logic State
@@ -69,6 +71,7 @@ const App: React.FC = () => {
   const [notification, setNotification] = useState<NotificationState>(null);
   const [taxRates, setTaxRates] = useState({ income: 10, corporate: 15, sales: 5 });
   const [persuasionBonus, setPersuasionBonus] = useState<number>(0);
+  const [newsFeed, setNewsFeed] = useState<NewsArticle[]>([]);
 
   // Footer State
   const [supporters, setSupporters] = useState<number>(5);
@@ -129,6 +132,16 @@ const App: React.FC = () => {
       setPublicBalance(prev => prev + lawToProcess.budget);
       setNotification({ message: `Lei "${lawToProcess.name}" aprovada! Verba de ${lawToProcess.budget}M adicionada.`, type: 'success' });
       
+      const newArticle: NewsArticle = {
+        id: crypto.randomUUID(),
+        headline: `Lei "${lawToProcess.name}" Aprovada!`,
+        body: `O parlamento aprovou a lei "${lawToProcess.name}", proposta por ${lawToProcess.author}. A medida conta com um orçamento de ${lawToProcess.budget}M para sua implementação.`,
+        day,
+        month,
+        year,
+      };
+      setNewsFeed(prev => [...prev, newArticle]);
+
       setPersuasionBonus(0); // Reset persuasion bonus even if not used for voting chance
       setPendingLaws(remainingLaws);
     }
@@ -172,6 +185,8 @@ const App: React.FC = () => {
   const handleClosePresidentModal = () => setIsPresidentModalOpen(false);
   const handleOpenSponsorshipModal = () => setIsSponsorshipModalOpen(true);
   const handleCloseSponsorshipModal = () => setIsSponsorshipModalOpen(false);
+  const handleOpenNewspaperModal = () => setIsNewspaperModalOpen(true);
+  const handleCloseNewspaperModal = () => setIsNewspaperModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     const playerPartyName = parties.find(p => p.color === playerPartyColor)?.name || "Meu Partido";
@@ -209,6 +224,17 @@ const App: React.FC = () => {
       if (effects.expenses) setExpenses(prev => Math.max(0, prev + effects.expenses!));
       if (effects.population) setPopulation(prev => prev + effects.population!);
       setNotification({ message: `${name} melhorado com sucesso!`, type: 'success' });
+
+      const improvementArticle: NewsArticle = {
+        id: crypto.randomUUID(),
+        headline: `Governo Anuncia Investimento em ${name}`,
+        body: `Um novo projeto de infraestrutura foi iniciado para a construção de ${name.toLowerCase()}. O investimento de ${cost}M visa melhorar a qualidade de vida da população.`,
+        day,
+        month,
+        year,
+      };
+      setNewsFeed(prev => [...prev, improvementArticle]);
+
     } else {
       setNotification({ message: 'Saldo público insuficiente para melhoria.', type: 'error' });
     }
@@ -316,6 +342,7 @@ const App: React.FC = () => {
         onOpenBalanceModal={handleOpenBalanceModal}
         onOpenPresidentModal={handleOpenPresidentModal}
         onOpenSponsorshipModal={handleOpenSponsorshipModal}
+        onOpenNewspaperModal={handleOpenNewspaperModal}
       />
       <Footer supporters={supporters} income={income} incomeChange={incomeChange} expenses={expenses} approval={approval} lawsPassed={lawsPassed} year={year} month={month} day={day} />
       <LawModal isOpen={isLawModalOpen} onClose={handleCloseLawModal} onProposeLaw={handleProposeLaw} />
@@ -326,6 +353,7 @@ const App: React.FC = () => {
       <CampaignModal isOpen={isCampaignModalOpen} onClose={handleCloseCampaignModal} parties={parties} onRunCampaign={handleRunCampaign} />
       <PresidentModal isOpen={isPresidentModalOpen} onClose={handleClosePresidentModal} onSelectPresident={handleSelectPresident} parliamentarians={parliamentLayout.flat().filter(p => p.color !== PersonColor.Empty)} />
       <SponsorshipModal isOpen={isSponsorshipModalOpen} onClose={handleCloseSponsorshipModal} onAccept={handleAcceptSponsorship} />
+      <NewspaperModal isOpen={isNewspaperModalOpen} onClose={handleCloseNewspaperModal} newsFeed={newsFeed} />
     </div>
   );
 };
