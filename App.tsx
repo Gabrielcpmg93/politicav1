@@ -184,7 +184,7 @@ const App: React.FC = () => {
   const handlePersonClick = (personId: string) => setSelectedPersonId(prevId => (prevId === personId ? null : personId));
   
   const handleConvince = () => {
-    const cost = 10;
+    const cost = 1;
     if (publicBalance < cost) {
       setNotification({ message: 'Saldo insuficiente para convencer.', type: 'error' });
       return;
@@ -298,7 +298,7 @@ const App: React.FC = () => {
     <div className="w-[420px] h-[850px] bg-gray-600 flex flex-col overflow-hidden shadow-2xl border-4 border-gray-700 rounded-2xl">
       <Header population={population} happiness={happiness} />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
-        <div className="absolute bottom-36 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
+        <div className="absolute bottom-28 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
         </div>
         <Parliament layout={parliamentLayout} selectedPersonId={selectedPersonId} onPersonClick={handlePersonClick} />
