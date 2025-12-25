@@ -15,6 +15,7 @@ import Notification from './components/Notification';
 import PresidentModal from './components/PresidentModal';
 import SponsorshipModal from './components/SponsorshipModal';
 import { generateParliamentLayout } from './constants';
+import { AI_LAW_PROPOSALS } from './aiLawProposals';
 import type { ParliamentLayout, Law, PersonData } from './types';
 import { PersonColor } from './types';
 
@@ -96,32 +97,53 @@ const App: React.FC = () => {
   };
   
   const handlePassDay = () => {
-    const nextDay = day === 28 ? 1 : day + 1;
-    
-    if (nextDay === 10) {
-      setIsCampaignModalOpen(true);
+    // AI Law Proposal Logic
+    if (pendingLaws.length === 0 && Math.random() < 0.15) { // 15% chance per day if no laws are pending
+        const aiParties = parties.filter(p => p.color !== playerPartyColor);
+        if (aiParties.length > 0) {
+            const proposingParty = aiParties[Math.floor(Math.random() * aiParties.length)];
+            const lawTemplate = AI_LAW_PROPOSALS[Math.floor(Math.random() * AI_LAW_PROPOSALS.length)];
+            
+            const newAILaw: Law = {
+                id: crypto.randomUUID(),
+                name: lawTemplate.name,
+                description: lawTemplate.description,
+                budget: lawTemplate.budget(),
+                status: 'pending',
+                author: proposingParty.name,
+            };
+            setPendingLaws(prev => [...prev, newAILaw]);
+            setNotification({ message: `${proposingParty.name} propôs a lei: "${newAILaw.name}"`, type: 'success' });
+        }
     }
 
+
+    // Law Voting Logic
     if (pendingLaws.length > 0) {
       const lawToProcess = pendingLaws[0];
       const remainingLaws = pendingLaws.slice(1);
       
+      const authorParty = parties.find(p => p.name === lawToProcess.author);
+      const authorPartySeats = authorParty?.seats || 0;
+      
       const baseChance = 40;
-      const playerPartySeats = parties.find(p => p.color === playerPartyColor)?.seats || 0;
-      const playerPartyBonus = (playerPartySeats / 48) * 30;
+      const partySeatBonus = (authorPartySeats / 48) * 40; // Bonus from party size
       
       let presidentBonus = 0;
       if (chamberPresidentId) {
         const president = parliamentLayout.flat().find(p => p.id === chamberPresidentId);
-        if (president?.color === playerPartyColor) {
-          presidentBonus = 10;
+        if (president?.party === lawToProcess.author) {
+          presidentBonus = 15; // President from the same party gives a big bonus
         }
       }
       
-      const totalChance = baseChance + playerPartyBonus + presidentBonus + persuasionBonus;
+      const isPlayerLaw = lawToProcess.author === (parties.find(p => p.color === playerPartyColor)?.name);
+      const finalPersuasionBonus = isPlayerLaw ? persuasionBonus : 0;
+      
+      const totalChance = baseChance + partySeatBonus + presidentBonus + finalPersuasionBonus;
       const isApproved = Math.random() * 100 < totalChance;
       
-      setPersuasionBonus(0);
+      setPersuasionBonus(0); // Persuasion bonus is a one-time use
 
       if (isApproved) {
           setLawsPassed(prev => prev + 1);
@@ -129,11 +151,12 @@ const App: React.FC = () => {
           setPublicBalance(prev => prev + lawToProcess.budget);
           setNotification({ message: `Lei "${lawToProcess.name}" aprovada! Verba de ${lawToProcess.budget}M adicionada.`, type: 'success' });
       } else {
-          setNotification({ message: `Lei "${lawToProcess.name}" foi rejeitada pelo parlamento.`, type: 'error' });
+          setNotification({ message: `A lei "${lawToProcess.name}" foi rejeitada pelo parlamento.`, type: 'error' });
       }
       setPendingLaws(remainingLaws);
     }
 
+    // Date and monthly updates
     if (day < 28) {
       setDay(prevDay => prevDay + 1);
     } else {
@@ -149,6 +172,11 @@ const App: React.FC = () => {
         setMonth(1);
         setYear(prevYear => prevYear + 1);
       }
+    }
+    
+    // Trigger campaign modal on a specific date
+    if (day === 27 && month % 6 === 0) { // Every 6 months
+      setIsCampaignModalOpen(true);
     }
   };
 
@@ -169,7 +197,8 @@ const App: React.FC = () => {
   const handleCloseSponsorshipModal = () => setIsSponsorshipModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
-    const newLaw: Law = { id: crypto.randomUUID(), name, description, status: 'pending', budget };
+    const playerPartyName = parties.find(p => p.color === playerPartyColor)?.name || "Meu Partido";
+    const newLaw: Law = { id: crypto.randomUUID(), name, description, status: 'pending', budget, author: playerPartyName };
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
@@ -253,7 +282,7 @@ const App: React.FC = () => {
 
         playerParty.seats += seatsFlipped;
         let seatsToDistribute = -seatsFlipped;
-        while(seatsToDistribute !== 0) {
+        while(seatsToDistribute !== 0 && oppositionParties.length > 0) {
             const partyToChange = oppositionParties[Math.floor(Math.random() * oppositionParties.length)];
             if(seatsToDistribute > 0 && partyToChange.seats < 48) {
                 partyToChange.seats++;
@@ -270,7 +299,7 @@ const App: React.FC = () => {
         const totalSeats = newParties.reduce((sum: number, p: Party) => sum + p.seats, 0);
         const discrepancy = 48 - totalSeats;
         if (discrepancy !== 0) {
-            const partyToAdjust = newParties.find((p: Party) => p.seats > 0);
+            const partyToAdjust = newParties.find((p: Party) => p.seats > 0 && (discrepancy < 0 ? p.seats > 1 : true));
             if(partyToAdjust) partyToAdjust.seats += discrepancy;
         }
         newParties.forEach((p: Party) => p.seats = Math.max(0, p.seats));

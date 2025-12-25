@@ -22,6 +22,7 @@ const ApprovedLawsModal: React.FC<ApprovedLawsModalProps> = ({ isOpen, onClose, 
                         laws.map(law => (
                             <div key={law.id} className="bg-gray-800 p-4 rounded-md border border-gray-600">
                                 <h3 className="font-bold text-lg text-yellow-300">{law.name}</h3>
+                                <p className="text-xs text-gray-400 italic">Proposta por: {law.author}</p>
                                 <p className="text-sm text-gray-300 my-1">{law.description}</p>
                                 <p className="text-xs text-green-400 font-mono">Verba: {law.budget} {law.budget > 1 ? 'Milhões' : 'Milhão'}</p>
                             </div>

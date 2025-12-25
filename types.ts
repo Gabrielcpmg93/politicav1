@@ -26,4 +26,5 @@ export interface Law {
   description: string;
   status: 'pending' | 'approved' | 'rejected';
   budget: number;
+  author: string;
 }
