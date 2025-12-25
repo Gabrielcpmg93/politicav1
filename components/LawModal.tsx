@@ -54,7 +54,7 @@ const LawModal: React.FC<LawModalProps> = ({ isOpen, onClose, onProposeLaw }) =>
                     </div>
                     <div>
                         <label htmlFor="law-budget" className="block text-sm font-medium text-gray-300 mb-1">
-                            Verba para a Lei: <span className="font-bold text-yellow-400">{budget} Milhão</span>
+                            Verba para a Lei: <span className="font-bold text-yellow-400">{budget} {budget > 1 ? 'Milhões' : 'Milhão'}</span>
                         </label>
                         <input
                             type="range"
