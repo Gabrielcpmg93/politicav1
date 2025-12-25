@@ -11,6 +11,7 @@ interface FooterProps {
   approval: number;
   lawsPassed: number;
   year: number;
+  month: number;
   day: number;
 }
 
@@ -22,6 +23,7 @@ const Footer: React.FC<FooterProps> = ({
   approval,
   lawsPassed,
   year,
+  month,
   day,
 }) => {
   return (
@@ -43,12 +45,10 @@ const Footer: React.FC<FooterProps> = ({
           <span className="text-lg">%</span>
           <span className="text-sm">{approval.toFixed(2)}</span>
         </div>
-        <div className="flex flex-col items-center text-center">
+        <div className="flex flex-col items-center text-center w-24">
           <span className="text-sm">{lawsPassed} Leis</span>
-          <div className="flex items-center text-sm font-bold">
-            <AnimatedNumber value={day} className="w-5 text-right" />
-            <span>/28</span>
-            <AnimatedNumber value={year} className="ml-2" />
+          <div className="flex items-center justify-center text-sm font-bold tabular-nums">
+            <AnimatedNumber value={day} />/<AnimatedNumber value={month} />/<AnimatedNumber value={year} />
           </div>
         </div>
       </div>

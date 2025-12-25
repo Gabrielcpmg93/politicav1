@@ -69,6 +69,7 @@ const App: React.FC = () => {
   const [approval, setApproval] = useState<number>(8.68);
   const [lawsPassed, setLawsPassed] = useState<number>(7);
   const [year, setYear] = useState<number>(2026);
+  const [month, setMonth] = useState<number>(1);
   const [day, setDay] = useState<number>(1);
 
   useEffect(() => {
@@ -86,14 +87,6 @@ const App: React.FC = () => {
     setGameStarted(true);
   };
   
-  const handleNextTurn = useCallback(() => {
-    setYear(prev => prev + 1);
-    setPublicBalance(prev => prev + income - expenses);
-    setPopulation(prev => Math.floor(prev * (1 + Math.random() * 0.01)));
-    setHappiness(prev => Math.max(1, Math.min(100, Math.round(prev + (Math.random() - 0.45) * 2))));
-    setApproval(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 2)));
-  }, [income, expenses]);
-
   const handlePassDay = () => {
     const nextDay = day === 28 ? 1 : day + 1;
     
@@ -120,7 +113,18 @@ const App: React.FC = () => {
       setDay(prevDay => prevDay + 1);
     } else {
       setDay(1);
-      handleNextTurn();
+      // Monthly updates
+      setPublicBalance(prev => prev + income - expenses);
+      setPopulation(prev => Math.floor(prev * (1 + Math.random() * 0.005))); // monthly growth
+      setHappiness(prev => Math.max(1, Math.min(100, Math.round(prev + (Math.random() - 0.48) * 2)))); // random fluctuation
+      setApproval(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 1))); // random fluctuation
+
+      if (month < 12) {
+        setMonth(prevMonth => prevMonth + 1);
+      } else { // End of year
+        setMonth(1);
+        setYear(prevYear => prevYear + 1);
+      }
     }
   };
 
@@ -258,7 +262,7 @@ const App: React.FC = () => {
         onOpenTaxModal={handleOpenTaxModal}
         onOpenBalanceModal={handleOpenBalanceModal}
       />
-      <Footer supporters={supporters} income={income} incomeChange={incomeChange} expenses={expenses} approval={approval} lawsPassed={lawsPassed} year={year} day={day} />
+      <Footer supporters={supporters} income={income} incomeChange={incomeChange} expenses={expenses} approval={approval} lawsPassed={lawsPassed} year={year} month={month} day={day} />
       <LawModal isOpen={isLawModalOpen} onClose={handleCloseLawModal} onProposeLaw={handleProposeLaw} />
       <ApprovedLawsModal isOpen={isApprovedLawsModalOpen} onClose={handleCloseApprovedLawsModal} laws={approvedLaws} />
       <ImprovementModal isOpen={isImprovementModalOpen} onClose={handleCloseImprovementModal} onPurchase={handlePurchaseImprovement} playerMoney={publicBalance} />

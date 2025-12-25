@@ -19,7 +19,7 @@ const BalanceModal: React.FC<BalanceModalProps> = ({ isOpen, onClose, balance })
                 <h2 className="text-3xl font-bold mb-4 text-yellow-400">Saldo Público</h2>
                 <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-center space-x-4">
                     <BankIcon className="w-12 h-12 text-yellow-300" />
-                    <span className="text-4xl font-mono font-bold text-white">{balance.toLocaleString()} M</span>
+                    <span className="text-4xl font-mono font-bold text-white">{balance} M</span>
                 </div>
                 <div className="mt-6 flex justify-end">
                     <button
