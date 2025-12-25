@@ -7,6 +7,7 @@ type Effect = {
     happiness?: number;
     approval?: number;
     expenses?: number;
+    population?: number;
 };
 
 type Improvement = {
@@ -19,7 +20,7 @@ type Improvement = {
 };
 
 const improvements: Improvement[] = [
-    { id: 'houses', name: 'Casas Populares', description: 'Melhora a qualidade de vida e aumenta sua base de apoio.', cost: 50, effect: { supporters: 1 }, icon: <BuildingIcon className="w-10 h-10 text-teal-300" /> },
+    { id: 'houses', name: 'Casas Populares', description: 'Melhora a qualidade de vida e aumenta sua base de apoio.', cost: 50, effect: { supporters: 1, happiness: 5, population: 2 }, icon: <BuildingIcon className="w-10 h-10 text-teal-300" /> },
     { id: 'schools', name: 'Escolas Públicas', description: 'População mais educada fica mais feliz.', cost: 75, effect: { happiness: 2 }, icon: <SchoolIcon className="w-10 h-10 text-purple-300" /> },
     { id: 'hospitals', name: 'Hospitais', description: 'Acesso à saúde aumenta a aprovação popular.', cost: 100, effect: { approval: 0.5 }, icon: <HospitalIcon className="w-10 h-10 text-red-300" /> },
     { id: 'sanitation', name: 'Saneamento Básico', description: 'Reduz despesas com saúde a longo prazo.', cost: 120, effect: { expenses: -1 }, icon: <SanitationIcon className="w-10 h-10 text-blue-300" /> }

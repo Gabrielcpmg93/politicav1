@@ -11,15 +11,17 @@ export const generateRandomName = (): string => {
     return `${firstName} ${lastName}`;
 };
 
-export const generateParliamentLayout = (partyDistribution: { party: string, seats: number, color: PersonColor }[]): ParliamentLayout => {
+export const generateParliamentLayout = (partyDistribution: { name: string, seats: number, color: PersonColor }[]): ParliamentLayout => {
     const people: PersonData[] = [];
-    partyDistribution.forEach(({ party, seats, color }) => {
+    partyDistribution.forEach(({ name, seats, color }) => {
         for (let i = 0; i < seats; i++) {
             people.push({
                 id: crypto.randomUUID(),
                 color,
                 name: generateRandomName(),
-                party,
+                party: name,
+                influence: Math.floor(Math.random() * 100) + 1,
+                loyalty: Math.floor(Math.random() * 100) + 1,
             });
         }
     });

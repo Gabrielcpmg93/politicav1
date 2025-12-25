@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon, TaxIcon, BankIcon } from './icons';
+import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon, TaxIcon, BankIcon, PodiumPersonIcon, CoinIcon } from './icons';
 
 interface ControlsProps {
   onPassDay: () => void;
@@ -9,12 +9,18 @@ interface ControlsProps {
   onOpenImprovementModal: () => void;
   onOpenTaxModal: () => void;
   onOpenBalanceModal: () => void;
+  onOpenPresidentModal: () => void;
+  onOpenSponsorshipModal: () => void;
   selectedPersonId: string | null;
   onConvince: () => void;
   onBribe: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, onOpenTaxModal, onOpenBalanceModal, selectedPersonId, onConvince, onBribe }) => {
+const Controls: React.FC<ControlsProps> = ({ 
+    onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, 
+    onOpenTaxModal, onOpenBalanceModal, selectedPersonId, onConvince, onBribe,
+    onOpenPresidentModal, onOpenSponsorshipModal
+}) => {
   if (selectedPersonId) {
     return (
       <div className="bg-gray-500 p-2 h-[104px] flex items-center justify-center space-x-4">
@@ -36,43 +42,18 @@ const Controls: React.FC<ControlsProps> = ({ onPassDay, onOpenLawModal, onOpenAp
     );
   }
 
+  const buttonClasses = "w-12 h-12 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center";
+
   return (
     <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-1">
-      <button
-        onClick={onOpenImprovementModal}
-        className="w-14 h-14 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2"
-      >
-        <BuildingIcon className="w-8 h-8 text-teal-100"/>
-      </button>
-       <button
-        onClick={onOpenTaxModal}
-        className="w-14 h-14 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-purple-600 border-b-4 border-purple-800 hover:bg-purple-700 active:border-b-2"
-      >
-        <TaxIcon className="w-8 h-8 text-purple-100"/>
-      </button>
-      <button
-        onClick={onOpenBalanceModal}
-        className="w-14 h-14 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-yellow-600 border-b-4 border-yellow-800 hover:bg-yellow-700 active:border-b-2"
-      >
-        <BankIcon className="w-8 h-8 text-yellow-100"/>
-      </button>
-      <button
-        onClick={onOpenApprovedLawsModal}
-        className="w-14 h-14 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-gray-600 border-b-4 border-gray-800 hover:bg-gray-700 active:border-b-2"
-      >
-        <ListIcon className="w-8 h-8 text-gray-100"/>
-      </button>
-      <button
-        onClick={onOpenLawModal}
-        className="w-14 h-14 font-bold text-white rounded-lg shadow-md transition-all duration-200 flex items-center justify-center bg-blue-500 border-b-4 border-blue-700 hover:bg-blue-600 active:border-b-2"
-      >
-        <LawIcon className="w-8 h-8 text-blue-100"/>
-      </button>
-      <button 
-        onClick={onPassDay}
-        className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center border-4 border-orange-700 shadow-lg hover:bg-orange-600 active:border-orange-500 transition-all">
-        <HourglassIcon className="w-8 h-8 text-white" />
-      </button>
+      <button onClick={onOpenImprovementModal} className={`${buttonClasses} bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2`}><BuildingIcon className="w-7 h-7 text-teal-100"/></button>
+      <button onClick={onOpenPresidentModal} className={`${buttonClasses} bg-indigo-600 border-b-4 border-indigo-800 hover:bg-indigo-700 active:border-b-2`}><PodiumPersonIcon className="w-7 h-7 text-indigo-100"/></button>
+      <button onClick={onOpenTaxModal} className={`${buttonClasses} bg-purple-600 border-b-4 border-purple-800 hover:bg-purple-700 active:border-b-2`}><TaxIcon className="w-7 h-7 text-purple-100"/></button>
+      <button onClick={onOpenBalanceModal} className={`${buttonClasses} bg-yellow-600 border-b-4 border-yellow-800 hover:bg-yellow-700 active:border-b-2`}><BankIcon className="w-7 h-7 text-yellow-100"/></button>
+      <button onClick={onOpenSponsorshipModal} className={`${buttonClasses} bg-pink-500 border-b-4 border-pink-700 hover:bg-pink-600 active:border-b-2`}><CoinIcon className="w-7 h-7 text-pink-100"/></button>
+      <button onClick={onOpenApprovedLawsModal} className={`${buttonClasses} bg-gray-600 border-b-4 border-gray-800 hover:bg-gray-700 active:border-b-2`}><ListIcon className="w-7 h-7 text-gray-100"/></button>
+      <button onClick={onOpenLawModal} className={`${buttonClasses} bg-blue-500 border-b-4 border-blue-700 hover:bg-blue-600 active:border-b-2`}><LawIcon className="w-7 h-7 text-blue-100"/></button>
+      <button onClick={onPassDay} className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center border-4 border-orange-700 shadow-lg hover:bg-orange-600 active:border-orange-500 transition-all"><HourglassIcon className="w-8 h-8 text-white" /></button>
     </div>
   );
 };
