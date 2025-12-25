@@ -73,9 +73,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const baseIncome = 20; // Base income from other sources
-    const incomeFromPopulation = population * (taxRates.income / 100) * 0.1;
+    const incomeFromPopulation = population * (taxRates.income / 100) * 0.8;
     const incomeFromCorporate = 10 * (taxRates.corporate / 10);
-    const incomeFromSales = population * (taxRates.sales / 100) * 0.2;
+    const incomeFromSales = population * (taxRates.sales / 100) * 1.5;
     const totalIncome = Math.round(baseIncome + incomeFromPopulation + incomeFromCorporate + incomeFromSales);
     setIncome(totalIncome);
   }, [taxRates, population]);
@@ -110,7 +110,8 @@ const App: React.FC = () => {
       if (isApproved) {
           setLawsPassed(prev => prev + 1);
           setApprovedLaws(prev => [...prev, { ...lawToProcess, status: 'approved' }]);
-          setNotification({ message: `Lei "${lawToProcess.name}" APROVADA!`, type: 'success' });
+          setPublicBalance(prev => prev + lawToProcess.budget);
+          setNotification({ message: `Lei "${lawToProcess.name}" aprovada! Verba de ${lawToProcess.budget}M adicionada.`, type: 'success' });
       }
       setPendingLaws(remainingLaws);
     }
@@ -136,13 +137,7 @@ const App: React.FC = () => {
   const handleCloseCampaignModal = () => setIsCampaignModalOpen(false);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
-    if (publicBalance < budget) {
-      setNotification({ message: 'Saldo público insuficiente para esta lei.', type: 'error' });
-      return;
-    }
-
     const newLaw: Law = { id: crypto.randomUUID(), name, description, status: 'pending', budget };
-    setPublicBalance(prev => prev - budget);
     setPendingLaws(prev => [...prev, newLaw]);
     handleCloseLawModal();
     setNotification({ message: 'Lei enviada para votação!', type: 'success' });
