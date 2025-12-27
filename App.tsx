@@ -66,6 +66,7 @@ const App: React.FC = () => {
   const [isNewspaperModalOpen, setIsNewspaperModalOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.2);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
 
   // Game Logic State
@@ -99,27 +100,34 @@ const App: React.FC = () => {
   useEffect(() => {
     const menuAudio = document.getElementById('menu-audio') as HTMLAudioElement;
     const gameAudio = document.getElementById('game-audio') as HTMLAudioElement;
-
-    if (!menuAudio || !gameAudio) return;
-
-    menuAudio.volume = volume;
-    gameAudio.volume = volume;
-
-    if (gameStarted) {
-      menuAudio.pause();
-      gameAudio.play().catch(e => console.warn("Game audio autoplay prevented:", e));
-    } else {
-      gameAudio.pause();
-      menuAudio.play().catch(e => console.warn("Menu audio autoplay prevented:", e));
-    }
-  }, [gameStarted, volume]);
+    if (menuAudio) menuAudio.volume = volume;
+    if (gameAudio) gameAudio.volume = volume;
+  }, [volume]);
 
   const handleStartGame = (sYear: number, party: string) => {
     setYear(sYear);
     setSelectedParty(party);
     setGameStarted(true);
+
+    const menuAudio = document.getElementById('menu-audio') as HTMLAudioElement;
+    const gameAudio = document.getElementById('game-audio') as HTMLAudioElement;
+    if (menuAudio) menuAudio.pause();
+    if (gameAudio) {
+        gameAudio.play().catch(e => console.warn("Game audio could not be played:", e));
+    }
   };
   
+  const handleMenuInteraction = () => {
+    if (isAudioPlaying || gameStarted) return;
+
+    const menuAudio = document.getElementById('menu-audio') as HTMLAudioElement;
+    if (menuAudio && menuAudio.paused) {
+        menuAudio.play().then(() => {
+            setIsAudioPlaying(true);
+        }).catch(e => console.warn("Menu audio could not be played on interaction:", e));
+    }
+  };
+
   const handlePassDay = () => {
     // AI Law Proposal Logic
     if (pendingLaws.length === 0 && Math.random() < 0.15) { // 15% chance per day if no laws are pending
@@ -343,7 +351,7 @@ const App: React.FC = () => {
   if (!gameStarted) {
     return (
         <>
-            <Menu onStartGame={handleStartGame} onOpenSettingsModal={handleOpenSettingsModal} />
+            <Menu onStartGame={handleStartGame} onOpenSettingsModal={handleOpenSettingsModal} onInteraction={handleMenuInteraction} />
             <SettingsModal isOpen={isSettingsModalOpen} onClose={handleCloseSettingsModal} volume={volume} onVolumeChange={handleVolumeChange} />
         </>
     );
