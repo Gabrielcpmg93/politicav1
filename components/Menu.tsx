@@ -4,6 +4,7 @@ import { StarIcon, GlobeIcon, SettingsIcon } from './icons';
 
 interface MenuProps {
   onStartGame: (year: number, party: string) => void;
+  onOpenSettingsModal: () => void;
 }
 
 const parties = [
@@ -12,12 +13,17 @@ const parties = [
     { id: 'ecologists', name: 'Ecologistas', icon: <SettingsIcon className="w-8 h-8"/>, color: 'bg-green-500' }
 ];
 
-const Menu: React.FC<MenuProps> = ({ onStartGame }) => {
+const Menu: React.FC<MenuProps> = ({ onStartGame, onOpenSettingsModal }) => {
   const [year, setYear] = useState<number>(2026);
   const [selectedParty, setSelectedParty] = useState<string>('progressivists');
 
   return (
-    <div className="w-[420px] h-[850px] bg-gray-700 flex flex-col justify-center items-center p-8 text-white font-bold shadow-2xl border-4 border-gray-800 rounded-2xl">
+    <div className="w-[420px] h-[850px] bg-gray-700 flex flex-col justify-center items-center p-8 text-white font-bold shadow-2xl border-4 border-gray-800 rounded-2xl relative">
+        <div className="absolute top-4 right-4">
+            <button onClick={onOpenSettingsModal} className="p-2 bg-gray-600 rounded-full hover:bg-gray-500 transition-colors">
+                <SettingsIcon className="w-8 h-8 text-gray-300" />
+            </button>
+        </div>
         <h1 className="text-5xl mb-4 text-yellow-400" style={{fontFamily: "'Georgia', serif"}}>Parliament Simulator</h1>
         <p className="text-lg text-gray-300 mb-12">Comece sua carreira política</p>
 

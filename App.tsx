@@ -15,6 +15,7 @@ import Notification from './components/Notification';
 import PresidentModal from './components/PresidentModal';
 import SponsorshipModal from './components/SponsorshipModal';
 import NewspaperModal from './components/NewspaperModal';
+import SettingsModal from './components/SettingsModal';
 import { generateParliamentLayout } from './constants';
 import { AI_LAW_PROPOSALS } from './aiLawProposals';
 import type { ParliamentLayout, Law, PersonData, NewsArticle } from './types';
@@ -63,6 +64,8 @@ const App: React.FC = () => {
   const [isPresidentModalOpen, setIsPresidentModalOpen] = useState<boolean>(false);
   const [isSponsorshipModalOpen, setIsSponsorshipModalOpen] = useState<boolean>(false);
   const [isNewspaperModalOpen, setIsNewspaperModalOpen] = useState<boolean>(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(0.2);
 
 
   // Game Logic State
@@ -92,6 +95,24 @@ const App: React.FC = () => {
     const totalIncome = Math.round(baseIncome + incomeFromPopulation + incomeFromCorporate + incomeFromSales);
     setIncome(totalIncome);
   }, [taxRates, population]);
+
+  useEffect(() => {
+    const menuAudio = document.getElementById('menu-audio') as HTMLAudioElement;
+    const gameAudio = document.getElementById('game-audio') as HTMLAudioElement;
+
+    if (!menuAudio || !gameAudio) return;
+
+    menuAudio.volume = volume;
+    gameAudio.volume = volume;
+
+    if (gameStarted) {
+      menuAudio.pause();
+      gameAudio.play().catch(e => console.warn("Game audio autoplay prevented:", e));
+    } else {
+      gameAudio.pause();
+      menuAudio.play().catch(e => console.warn("Menu audio autoplay prevented:", e));
+    }
+  }, [gameStarted, volume]);
 
   const handleStartGame = (sYear: number, party: string) => {
     setYear(sYear);
@@ -187,6 +208,9 @@ const App: React.FC = () => {
   const handleCloseSponsorshipModal = () => setIsSponsorshipModalOpen(false);
   const handleOpenNewspaperModal = () => setIsNewspaperModalOpen(true);
   const handleCloseNewspaperModal = () => setIsNewspaperModalOpen(false);
+  const handleOpenSettingsModal = () => setIsSettingsModalOpen(true);
+  const handleCloseSettingsModal = () => setIsSettingsModalOpen(false);
+  const handleVolumeChange = (newVolume: number) => setVolume(newVolume);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
     const playerPartyName = parties.find(p => p.color === playerPartyColor)?.name || "Meu Partido";
@@ -317,12 +341,17 @@ const App: React.FC = () => {
 
 
   if (!gameStarted) {
-    return <Menu onStartGame={handleStartGame} />;
+    return (
+        <>
+            <Menu onStartGame={handleStartGame} onOpenSettingsModal={handleOpenSettingsModal} />
+            <SettingsModal isOpen={isSettingsModalOpen} onClose={handleCloseSettingsModal} volume={volume} onVolumeChange={handleVolumeChange} />
+        </>
+    );
   }
 
   return (
     <div className="w-[420px] h-[850px] bg-gray-600 flex flex-col overflow-hidden shadow-2xl border-4 border-gray-700 rounded-2xl">
-      <Header population={population} happiness={happiness} />
+      <Header population={population} happiness={happiness} onOpenSettingsModal={handleOpenSettingsModal} />
       <main className="flex-grow flex flex-col items-center justify-center p-4 bg-gray-500 relative">
         <div className="absolute bottom-28 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
@@ -354,6 +383,7 @@ const App: React.FC = () => {
       <PresidentModal isOpen={isPresidentModalOpen} onClose={handleClosePresidentModal} onSelectPresident={handleSelectPresident} parliamentarians={parliamentLayout.flat().filter(p => p.color !== PersonColor.Empty)} />
       <SponsorshipModal isOpen={isSponsorshipModalOpen} onClose={handleCloseSponsorshipModal} onAccept={handleAcceptSponsorship} />
       <NewspaperModal isOpen={isNewspaperModalOpen} onClose={handleCloseNewspaperModal} newsFeed={newsFeed} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={handleCloseSettingsModal} volume={volume} onVolumeChange={handleVolumeChange} />
     </div>
   );
 };

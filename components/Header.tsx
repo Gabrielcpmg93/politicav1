@@ -5,9 +5,10 @@ import { PopulationIcon, SmileyIcon, GlobeIcon, SettingsIcon } from './icons';
 interface HeaderProps {
   population: number;
   happiness: number;
+  onOpenSettingsModal: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ population, happiness }) => {
+const Header: React.FC<HeaderProps> = ({ population, happiness, onOpenSettingsModal }) => {
   return (
     <header className="bg-gray-700 text-white shadow-md z-10">
       <div className="p-2 flex justify-between items-center">
@@ -25,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ population, happiness }) => {
           <button className="p-1 bg-gray-800 bg-opacity-50 rounded-md border border-gray-600 hover:bg-opacity-75">
             <GlobeIcon className="w-8 h-8 text-blue-400" />
           </button>
-          <button className="p-1 bg-gray-800 bg-opacity-50 rounded-md border border-gray-600 hover:bg-opacity-75">
+          <button onClick={onOpenSettingsModal} className="p-1 bg-gray-800 bg-opacity-50 rounded-md border border-gray-600 hover:bg-opacity-75">
             <SettingsIcon className="w-8 h-8 text-gray-400" />
           </button>
         </div>
