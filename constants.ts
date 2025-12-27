@@ -1,5 +1,5 @@
 
-import type { ParliamentLayout, PersonData } from './types';
+import type { ParliamentLayout, PersonData, City } from './types';
 import { PersonColor } from './types';
 
 const firstNames = ['Artur', 'Bruno', 'Carlos', 'Davi', 'Enzo', 'Felipe', 'Gustavo', 'Heitor', 'Igor', 'João', 'Lucas', 'Miguel', 'Nicolas', 'Otto', 'Pedro', 'Rafael', 'Samuel', 'Thiago', 'Victor', 'Alice', 'Beatriz', 'Clara', 'Eduarda', 'Fernanda', 'Gabriela', 'Helena', 'Isabela', 'Júlia', 'Laura'];
@@ -10,6 +10,14 @@ export const generateRandomName = (): string => {
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     return `${firstName} ${lastName}`;
 };
+
+export const CITIES: City[] = [
+    { id: 'nova-esperanca', name: 'Nova Esperança', mayor: generateRandomName() },
+    { id: 'porto-dourado', name: 'Porto Dourado', mayor: generateRandomName() },
+    { id: 'vale-verde', name: 'Vale Verde', mayor: generateRandomName() },
+    { id: 'serra-azul', name: 'Serra Azul', mayor: generateRandomName() },
+    { id: 'rio-claro', name: 'Rio Claro', mayor: generateRandomName() },
+];
 
 export const generateParliamentLayout = (partyDistribution: { name: string, seats: number, color: PersonColor }[]): ParliamentLayout => {
     const people: PersonData[] = [];

@@ -37,3 +37,9 @@ export interface NewsArticle {
   month: number;
   year: number;
 }
+
+export interface City {
+  id: string;
+  name: string;
+  mayor: string;
+}

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon, TaxIcon, BankIcon, PodiumPersonIcon, CoinIcon, NewspaperIcon } from './icons';
+import { HourglassIcon, LawIcon, HandshakeIcon, MoneyBagIcon, ListIcon, BuildingIcon, TaxIcon, BankIcon, PodiumPersonIcon, CoinIcon, NewspaperIcon, CityIcon } from './icons';
 
 interface ControlsProps {
   onPassDay: () => void;
@@ -12,6 +12,7 @@ interface ControlsProps {
   onOpenPresidentModal: () => void;
   onOpenSponsorshipModal: () => void;
   onOpenNewspaperModal: () => void;
+  onOpenCitiesModal: () => void;
   selectedPersonId: string | null;
   onConvince: () => void;
   onBribe: () => void;
@@ -20,7 +21,7 @@ interface ControlsProps {
 const Controls: React.FC<ControlsProps> = ({ 
     onPassDay, onOpenLawModal, onOpenApprovedLawsModal, onOpenImprovementModal, 
     onOpenTaxModal, onOpenBalanceModal, selectedPersonId, onConvince, onBribe,
-    onOpenPresidentModal, onOpenSponsorshipModal, onOpenNewspaperModal
+    onOpenPresidentModal, onOpenSponsorshipModal, onOpenNewspaperModal, onOpenCitiesModal
 }) => {
   if (selectedPersonId) {
     return (
@@ -49,6 +50,7 @@ const Controls: React.FC<ControlsProps> = ({
     <div className="bg-gray-500 p-2 h-[104px] flex items-end justify-center space-x-1">
       <button onClick={onOpenImprovementModal} className={`${buttonClasses} bg-teal-600 border-b-4 border-teal-800 hover:bg-teal-700 active:border-b-2`}><BuildingIcon className="w-7 h-7 text-teal-100"/></button>
       <button onClick={onOpenNewspaperModal} className={`${buttonClasses} bg-amber-700 border-b-4 border-amber-900 hover:bg-amber-800 active:border-b-2`}><NewspaperIcon className="w-7 h-7 text-amber-100"/></button>
+      <button onClick={onOpenCitiesModal} className={`${buttonClasses} bg-cyan-600 border-b-4 border-cyan-800 hover:bg-cyan-700 active:border-b-2`}><CityIcon className="w-7 h-7 text-cyan-100"/></button>
       <button onClick={onOpenPresidentModal} className={`${buttonClasses} bg-indigo-600 border-b-4 border-indigo-800 hover:bg-indigo-700 active:border-b-2`}><PodiumPersonIcon className="w-7 h-7 text-indigo-100"/></button>
       <button onClick={onOpenTaxModal} className={`${buttonClasses} bg-purple-600 border-b-4 border-purple-800 hover:bg-purple-700 active:border-b-2`}><TaxIcon className="w-7 h-7 text-purple-100"/></button>
       <button onClick={onOpenBalanceModal} className={`${buttonClasses} bg-yellow-600 border-b-4 border-yellow-800 hover:bg-yellow-700 active:border-b-2`}><BankIcon className="w-7 h-7 text-yellow-100"/></button>

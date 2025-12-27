@@ -7,9 +7,10 @@ interface ParliamentProps {
   layout: ParliamentLayout;
   selectedPersonId: string | null;
   onPersonClick: (id: string) => void;
+  chamberPresidentId: string | null;
 }
 
-const Parliament: React.FC<ParliamentProps> = ({ layout, selectedPersonId, onPersonClick }) => {
+const Parliament: React.FC<ParliamentProps> = ({ layout, selectedPersonId, onPersonClick, chamberPresidentId }) => {
   return (
     <div className="w-full max-w-sm flex flex-col gap-1.5 p-2 z-10">
       {layout.map((row, rowIndex) => (
@@ -21,7 +22,8 @@ const Parliament: React.FC<ParliamentProps> = ({ layout, selectedPersonId, onPer
             {row.map((person) => (
               <Person 
                 key={person.id} 
-                {...person} 
+                {...person}
+                statusIcon={person.id === chamberPresidentId ? 'star' : person.statusIcon}
                 isSelected={selectedPersonId === person.id}
                 onClick={() => onPersonClick(person.id)}
               />

@@ -16,9 +16,10 @@ import PresidentModal from './components/PresidentModal';
 import SponsorshipModal from './components/SponsorshipModal';
 import NewspaperModal from './components/NewspaperModal';
 import SettingsModal from './components/SettingsModal';
-import { generateParliamentLayout } from './constants';
+import CitiesModal from './components/CitiesModal';
+import { generateParliamentLayout, CITIES } from './constants';
 import { AI_LAW_PROPOSALS } from './aiLawProposals';
-import type { ParliamentLayout, Law, PersonData, NewsArticle } from './types';
+import type { ParliamentLayout, Law, PersonData, NewsArticle, City } from './types';
 import { PersonColor } from './types';
 
 type NotificationState = {
@@ -65,6 +66,7 @@ const App: React.FC = () => {
   const [isSponsorshipModalOpen, setIsSponsorshipModalOpen] = useState<boolean>(false);
   const [isNewspaperModalOpen, setIsNewspaperModalOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const [isCitiesModalOpen, setIsCitiesModalOpen] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.2);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
@@ -76,6 +78,7 @@ const App: React.FC = () => {
   const [taxRates, setTaxRates] = useState({ income: 10, corporate: 15, sales: 5 });
   const [persuasionBonus, setPersuasionBonus] = useState<number>(0);
   const [newsFeed, setNewsFeed] = useState<NewsArticle[]>([]);
+  const [cities, setCities] = useState<City[]>(CITIES);
 
   // Footer State
   const [supporters, setSupporters] = useState<number>(5);
@@ -129,6 +132,11 @@ const App: React.FC = () => {
   };
 
   const handlePassDay = () => {
+    // Trigger campaign modal on a specific date
+    if (day === 28 && month % 6 === 0) { // Every 6 months on the last day
+      setIsCampaignModalOpen(true);
+    }
+    
     // AI Law Proposal Logic
     if (pendingLaws.length === 0 && Math.random() < 0.15) { // 15% chance per day if no laws are pending
         const aiParties = parties.filter(p => p.color !== playerPartyColor);
@@ -192,11 +200,6 @@ const App: React.FC = () => {
         setYear(prevYear => prevYear + 1);
       }
     }
-    
-    // Trigger campaign modal on a specific date
-    if (day === 27 && month % 6 === 0) { // Every 6 months
-      setIsCampaignModalOpen(true);
-    }
   };
 
   const handleOpenLawModal = () => setIsLawModalOpen(true);
@@ -218,6 +221,8 @@ const App: React.FC = () => {
   const handleCloseNewspaperModal = () => setIsNewspaperModalOpen(false);
   const handleOpenSettingsModal = () => setIsSettingsModalOpen(true);
   const handleCloseSettingsModal = () => setIsSettingsModalOpen(false);
+  const handleOpenCitiesModal = () => setIsCitiesModalOpen(true);
+  const handleCloseCitiesModal = () => setIsCitiesModalOpen(false);
   const handleVolumeChange = (newVolume: number) => setVolume(newVolume);
 
   const handleProposeLaw = (name: string, description: string, budget: number) => {
@@ -346,6 +351,18 @@ const App: React.FC = () => {
 
     setSupporters(prev => prev + seatsFlipped);
   };
+  
+  const handleHelpCity = (cityId: string) => {
+      const cost = 20; // 20M
+      if (publicBalance >= cost) {
+          setPublicBalance(prev => prev - cost);
+          setHappiness(prev => Math.min(100, prev + 1));
+          const cityName = cities.find(c => c.id === cityId)?.name;
+          setNotification({ message: `Você enviou ${cost}M para ajudar ${cityName}! A felicidade aumentou.`, type: 'success' });
+      } else {
+          setNotification({ message: 'Saldo público insuficiente para ajudar a cidade.', type: 'error' });
+      }
+  };
 
 
   if (!gameStarted) {
@@ -364,7 +381,7 @@ const App: React.FC = () => {
         <div className="absolute bottom-28 w-24 h-16 bg-[#a0522d] border-2 border-[#6f391f] rounded-md shadow-inner flex items-center justify-center z-0">
             <div className="w-20 h-12 bg-[#d2b48c] border-2 border-[#a0522d] rounded-sm"></div>
         </div>
-        <Parliament layout={parliamentLayout} selectedPersonId={selectedPersonId} onPersonClick={handlePersonClick} />
+        <Parliament layout={parliamentLayout} selectedPersonId={selectedPersonId} onPersonClick={handlePersonClick} chamberPresidentId={chamberPresidentId} />
         {notification && <Notification message={notification.message} type={notification.type} onClose={() => setNotification(null)} />}
       </main>
       <Controls
@@ -380,6 +397,7 @@ const App: React.FC = () => {
         onOpenPresidentModal={handleOpenPresidentModal}
         onOpenSponsorshipModal={handleOpenSponsorshipModal}
         onOpenNewspaperModal={handleOpenNewspaperModal}
+        onOpenCitiesModal={handleOpenCitiesModal}
       />
       <Footer supporters={supporters} income={income} incomeChange={incomeChange} expenses={expenses} approval={approval} lawsPassed={lawsPassed} year={year} month={month} day={day} />
       <LawModal isOpen={isLawModalOpen} onClose={handleCloseLawModal} onProposeLaw={handleProposeLaw} />
@@ -392,6 +410,7 @@ const App: React.FC = () => {
       <SponsorshipModal isOpen={isSponsorshipModalOpen} onClose={handleCloseSponsorshipModal} onAccept={handleAcceptSponsorship} />
       <NewspaperModal isOpen={isNewspaperModalOpen} onClose={handleCloseNewspaperModal} newsFeed={newsFeed} />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={handleCloseSettingsModal} volume={volume} onVolumeChange={handleVolumeChange} />
+      <CitiesModal isOpen={isCitiesModalOpen} onClose={handleCloseCitiesModal} cities={cities} onHelpCity={handleHelpCity} publicBalance={publicBalance} />
     </div>
   );
 };
